@@ -1,0 +1,26 @@
+{
+  "extends": "solhint:recommended",
+  "rules": {
+    "no-console": "off",
+    "func-visibility": [
+      "warn",
+      {
+        "ignoreConstructors": true
+      }
+    ],
+    "gas-custom-errors": "off",
+    "immutable-vars-naming": "off",
+    "compiler-version": [
+      "error",
+      ">=0.8.0"
+    ],
+    "avoid-low-level-calls": "off",
+    "no-empty-blocks": "warn",
+    "quotes": ["error", "double"],
+    "const-name-snakecase": "warn",
+    "contract-name-camelcase": "error",
+    "event-name-camelcase": "error",
+    "func-name-mixedcase": "error",
+    "var-name-mixedcase": "warn"
+  }
+}

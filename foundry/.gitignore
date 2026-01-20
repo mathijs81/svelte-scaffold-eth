@@ -1,0 +1,49 @@
+# Compiler files
+cache/
+out/
+
+# Ignore local development broadcast logs
+# Localhost/Anvil
+broadcast/*/31337/
+# Localhost alternative
+broadcast/*/1337/
+
+# Production broadcasts are tracked for deployment records
+# You can commit these for mainnet/testnet deployments
+# broadcast/*/1/         # Mainnet (remove this comment to track)
+# broadcast/*/11155111/  # Sepolia (remove this comment to track)
+
+# Dotenv file
+.env
+
+# Foundry build artifacts
+artifacts/
+
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+anvil.log
+
+# Coverage reports
+coverage/
+lcov.info
+
+# Gas snapshots
+.gas-snapshot
+
+# Documentation
+docs/
+
+# IDE files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Deployment outputs
+deployments/
+addresses.json
+deployedContracts.json

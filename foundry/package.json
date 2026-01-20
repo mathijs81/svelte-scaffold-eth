@@ -1,0 +1,43 @@
+{
+  "name": "@svelte-eth-starter/foundry",
+  "version": "0.1.0",
+  "description": "Foundry smart contracts for Svelte-ETH Starter",
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "test:coverage": "forge coverage",
+    "test:gas": "forge test --gas-report",
+    "test:verbose": "forge test -vvv",
+    "format": "forge fmt",
+    "format:check": "forge fmt --check",
+    "lint": "pnpx solhint 'src/**/*.sol' 'script/**/*.sol' 'test/**/*.sol'",
+    "clean": "rm -rf cache out broadcast",
+    "chain": "bash anvil.sh",
+    "chain:kill": "bash anvil.sh --kill",
+    "chain:restart": "bash anvil.sh --restart",
+    "generate": "tsx utils/generateContracts.ts",
+    "deploy": "forge script script/Deploy.s.sol --broadcast && pnpm run generate",
+    "deploy:anvil": "forge script script/Deploy.s.sol --rpc-url anvil --broadcast --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 && pnpm run generate",
+    "deploy:localhost": "forge script script/Deploy.s.sol --rpc-url localhost --broadcast --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 && pnpm run generate",
+    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url sepolia --broadcast --verify && pnpm run generate",
+    "deploy:base-sepolia": "forge script script/Deploy.s.sol --rpc-url base-sepolia --broadcast --verify && pnpm run generate",
+    "deploy:optimism-sepolia": "forge script script/Deploy.s.sol --rpc-url optimism-sepolia --broadcast --verify && pnpm run generate",
+    "deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol --rpc-url arbitrum-sepolia --broadcast --verify && pnpm run generate",
+    "verify:sepolia": "forge verify-contract <CONTRACT_ADDRESS> src/YourContract.sol:YourContract --chain sepolia --watch",
+    "snapshot": "forge snapshot",
+    "snapshot:diff": "forge snapshot --diff"
+  },
+  "keywords": [
+    "solidity",
+    "foundry",
+    "ethereum",
+    "smart-contracts"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "solhint": "^5.0.3",
+    "tsx": "^4.19.2"
+  }
+}

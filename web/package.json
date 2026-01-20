@@ -36,6 +36,10 @@
     "vitest-browser-svelte": "^2.0.1"
   },
   "dependencies": {
-    "daisyui": "^5.5.14"
+    "@wagmi/core": "^2.9.0",
+    "@wagmi/connectors": "^5.0.0",
+    "abitype": "^1.0.0",
+    "daisyui": "^5.5.14",
+    "viem": "^2.21.0"
   }
 }
