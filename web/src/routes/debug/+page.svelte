@@ -1,6 +1,6 @@
 <script lang="ts">
 import deployedContracts from "$lib/contracts/deployedContracts";
-import { createAccount } from "$lib/runes";
+import { createAccount } from "$lib/utils";
 import ContractUI from "./ContractUI.svelte";
 import { connect, disconnect } from "@wagmi/core";
 import { config } from "$lib/wagmi/config";
@@ -8,18 +8,19 @@ import { injected } from "@wagmi/connectors";
 import XCircleIcon from "phosphor-svelte/lib/XCircle";
 import WarningIcon from "phosphor-svelte/lib/Warning";
 import InfoIcon from "phosphor-svelte/lib/Info";
+import type {
+  ChainId,
+  ContractName,
+} from "$lib/runes/createDeployedContractInfo.svelte";
 
 const account = createAccount();
 
-// Cleanup on component unmount
-$effect(() => {
-  return () => account.destroy();
-});
-
 // Get all deployed contracts for the current chain (31337 = foundry)
-const chainId = 31337;
-const contracts = deployedContracts[chainId] || {};
-const contractNames = Object.keys(contracts);
+// FIXME add chain chooser
+const chainId = "31337" as ChainId;
+const contracts =
+  deployedContracts[chainId as keyof typeof deployedContracts] || {};
+const contractNames = Object.keys(contracts) as ContractName<ChainId>[];
 
 let connectError = $state<string | null>(null);
 
@@ -33,9 +34,10 @@ async function connectWallet() {
       return;
     }
     await connect(config, { connector: injected() });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Failed to connect wallet:", error);
-    connectError = error?.message || "Failed to connect wallet";
+    connectError =
+      error instanceof Error ? error.message : "Failed to connect wallet";
   }
 }
 

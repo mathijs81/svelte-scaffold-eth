@@ -1,5 +1,5 @@
 import { http, createConfig } from "@wagmi/core";
-import { injected, walletConnect } from "@wagmi/connectors";
+import { injected } from "@wagmi/connectors";
 import { chains } from "./chains";
 
 /**
@@ -7,7 +7,7 @@ import { chains } from "./chains";
  * Uses @wagmi/core (framework-agnostic) instead of React wagmi
  */
 export const config = createConfig({
-  chains: chains as any,
+  chains: chains,
   connectors: [
     injected(),
     // Uncomment to add WalletConnect support

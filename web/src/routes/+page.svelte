@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createAccount } from "$lib/runes";
+import { createAccount } from "$lib/utils";
 import { connect, disconnect } from "@wagmi/core";
 import { config } from "$lib/wagmi/config";
 import { injected } from "@wagmi/connectors";
@@ -8,10 +8,6 @@ import CodeIcon from "phosphor-svelte/lib/Code";
 import GithubLogoIcon from "phosphor-svelte/lib/GithubLogo";
 
 const account = createAccount();
-
-$effect(() => {
-  return () => account.destroy();
-});
 
 let connectError = $state<string | null>(null);
 

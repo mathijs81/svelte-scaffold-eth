@@ -13,7 +13,7 @@ interface WriteContractParams<TAbi extends Abi = Abi> {
   /** Function name to call */
   functionName: string;
   /** Chain ID (defaults to current chain) */
-  chainId?: ChainId;
+  chainId: ChainId;
   /** Custom ABI (optional, uses deployed contract ABI by default) */
   abi?: TAbi;
   /** Custom address (optional, uses deployed contract address by default) */
@@ -23,7 +23,7 @@ interface WriteContractParams<TAbi extends Abi = Abi> {
 }
 
 /**
- * Reactive rune to write to a contract
+ * Reactive utility to write to a contract
  *
  * @param params - Write contract parameters
  * @returns Object with writeContract function and transaction states
@@ -67,7 +67,7 @@ export function createWriteContract<TAbi extends Abi = Abi>(
   const {
     contractName,
     functionName,
-    chainId = 31337,
+    chainId,
     abi: customAbi,
     address: customAddress,
     value,
@@ -77,7 +77,7 @@ export function createWriteContract<TAbi extends Abi = Abi>(
   const contractInfo =
     customAbi && customAddress
       ? { address: customAddress, abi: customAbi }
-      : createDeployedContractInfo(contractName as any, chainId as any);
+      : createDeployedContractInfo(contractName, chainId);
 
   if (!contractInfo) {
     error = new Error(`Contract ${contractName} not found on chain ${chainId}`);
@@ -87,7 +87,7 @@ export function createWriteContract<TAbi extends Abi = Abi>(
    * Execute the contract write
    * @param args - Function arguments
    */
-  async function write(args: readonly unknown[] = []) {
+  async function write(args: Parameters<typeof writeContract>[1]["args"] = []) {
     if (!contractInfo) {
       error = new Error(
         `Contract ${contractName} not found on chain ${chainId}`,
@@ -107,9 +107,9 @@ export function createWriteContract<TAbi extends Abi = Abi>(
         address: contractInfo.address,
         abi: contractInfo.abi,
         functionName,
-        args: args as any,
+        args: args as Parameters<typeof writeContract>[1]["args"],
         value,
-      } as any);
+      });
 
       hash = txHash;
       isPending = false;
@@ -118,7 +118,10 @@ export function createWriteContract<TAbi extends Abi = Abi>(
       // Wait for transaction confirmation
       await waitForTransactionReceipt(config, {
         hash: txHash,
-        chainId,
+        chainId: parseInt(
+          chainId,
+          10,
+        ) as (typeof config)["chains"][number]["id"],
       });
 
       isConfirming = false;

@@ -1,4 +1,4 @@
-// Custom Svelte 5 runes for Web3 interactions
+// Reactive utilities for Web3 interactions
 
 export { createAccount } from "./createAccount.svelte";
 export { createReadContract } from "./createReadContract.svelte";

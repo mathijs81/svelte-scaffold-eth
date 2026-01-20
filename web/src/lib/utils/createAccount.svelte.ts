@@ -2,7 +2,7 @@ import { getAccount, watchAccount } from "@wagmi/core";
 import { config } from "$lib/wagmi/config";
 
 /**
- * Reactive rune to watch the connected wallet account
+ * Reactive utility to watch the connected wallet account
  *
  * @returns Reactive state with account address, connection status, and chain ID
  *
@@ -34,17 +34,21 @@ export function createAccount() {
   chainId = initialAccount.chainId;
   status = initialAccount.status;
 
-  // Watch for changes
-  const unwatch = watchAccount(config, {
-    onChange(account) {
-      address = account.address;
-      isConnected = account.isConnected;
-      chainId = account.chainId;
-      status = account.status;
-    },
+  // Watch for changes and cleanup automatically
+  $effect(() => {
+    const unwatch = watchAccount(config, {
+      onChange(account) {
+        address = account.address;
+        isConnected = account.isConnected;
+        chainId = account.chainId;
+        status = account.status;
+      },
+    });
+
+    return unwatch;
   });
 
-  // Return state and cleanup function
+  // Return reactive state
   return {
     get address() {
       return address;
@@ -58,6 +62,5 @@ export function createAccount() {
     get status() {
       return status;
     },
-    destroy: unwatch,
   };
 }

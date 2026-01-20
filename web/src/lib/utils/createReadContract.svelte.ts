@@ -1,17 +1,21 @@
 import { readContract, watchBlockNumber } from "@wagmi/core";
 import { config } from "$lib/wagmi/config";
-import { createDeployedContractInfo } from "./createDeployedContractInfo.svelte";
+import {
+  createDeployedContractInfo,
+  type ChainId,
+  type ContractName,
+} from "./createDeployedContractInfo.svelte";
 import type { Abi } from "viem";
 
 interface ReadContractParams<TAbi extends Abi = Abi> {
   /** Contract name from deployedContracts */
-  contractName: string;
+  contractName: ContractName<ChainId>;
   /** Function name to call */
   functionName: string;
   /** Function arguments (if any) */
   args?: readonly unknown[];
   /** Chain ID (defaults to current chain) */
-  chainId?: number;
+  chainId: ChainId;
   /** Custom ABI (optional, uses deployed contract ABI by default) */
   abi?: TAbi;
   /** Custom address (optional, uses deployed contract address by default) */
@@ -23,7 +27,7 @@ interface ReadContractParams<TAbi extends Abi = Abi> {
 }
 
 /**
- * Reactive rune to read contract state
+ * Reactive utility to read contract state
  *
  * @param params - Read contract parameters
  * @returns Reactive state with data, loading, and error states
@@ -53,13 +57,12 @@ export function createReadContract<TAbi extends Abi = Abi>(
   let data = $state<unknown>(undefined);
   let isLoading = $state(true);
   let error = $state<Error | null>(null);
-  let unwatchBlockNumber: (() => void) | undefined;
 
   const {
     contractName,
     functionName,
     args = [],
-    chainId = 31337,
+    chainId,
     abi: customAbi,
     address: customAddress,
     watch = false,
@@ -70,7 +73,7 @@ export function createReadContract<TAbi extends Abi = Abi>(
   const contractInfo =
     customAbi && customAddress
       ? { address: customAddress, abi: customAbi }
-      : createDeployedContractInfo(contractName as any, chainId as any);
+      : createDeployedContractInfo(contractName, chainId);
 
   if (!contractInfo) {
     error = new Error(`Contract ${contractName} not found on chain ${chainId}`);
@@ -89,8 +92,8 @@ export function createReadContract<TAbi extends Abi = Abi>(
         address: contractInfo.address,
         abi: contractInfo.abi,
         functionName,
-        args: args as any,
-      } as any);
+        args: args as Parameters<typeof readContract>[1]["args"],
+      });
       data = result;
     } catch (e) {
       error = e instanceof Error ? e : new Error(String(e));
@@ -102,19 +105,26 @@ export function createReadContract<TAbi extends Abi = Abi>(
   // Initial fetch
   fetchData();
 
-  // Set up watching if enabled
+  // Set up watching with automatic cleanup
   if (watch && contractInfo) {
-    let lastBlockNumber = 0n;
+    $effect(() => {
+      let lastBlockNumber = 0n;
 
-    unwatchBlockNumber = watchBlockNumber(config, {
-      chainId,
-      onBlockNumber(blockNumber) {
-        if (blockNumber > lastBlockNumber) {
-          lastBlockNumber = blockNumber;
-          fetchData();
-        }
-      },
-      pollingInterval,
+      const unwatchBlockNumber = watchBlockNumber(config, {
+        chainId: parseInt(
+          chainId,
+          10,
+        ) as (typeof config)["chains"][number]["id"],
+        onBlockNumber(blockNumber) {
+          if (blockNumber > lastBlockNumber) {
+            lastBlockNumber = blockNumber;
+            fetchData();
+          }
+        },
+        pollingInterval,
+      });
+
+      return unwatchBlockNumber;
     });
   }
 
@@ -129,10 +139,5 @@ export function createReadContract<TAbi extends Abi = Abi>(
       return error;
     },
     refetch: fetchData,
-    destroy: () => {
-      if (unwatchBlockNumber) {
-        unwatchBlockNumber();
-      }
-    },
   };
 }

@@ -27,16 +27,17 @@ export type ContractName<TChainId extends ChainId> =
  * {/if}
  * ```
  */
-export function createDeployedContractInfo<TChainId extends ChainId>(
-  contractName: ContractName<TChainId>,
-  chainId: TChainId,
+export function createDeployedContractInfo(
+  contractName: ContractName<ChainId>,
+  chainId: ChainId,
 ) {
-  const chainData = deployedContracts[chainId];
+  const chainData =
+    deployedContracts[chainId as keyof typeof deployedContracts];
   if (!chainData) {
     return null;
   }
 
-  const contract = chainData[contractName as keyof typeof chainData] as any;
+  const contract = chainData[contractName as keyof typeof chainData];
   if (!contract) {
     return null;
   }

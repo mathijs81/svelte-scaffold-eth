@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createReadContract, createWriteContract } from "$lib/runes";
+import { createReadContract, createWriteContract } from "$lib/utils";
 import StringInput from "$lib/components/inputs/StringInput.svelte";
 import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
 import AddressInput from "$lib/components/inputs/AddressInput.svelte";
@@ -7,7 +7,7 @@ import type { AbiFunction, AbiParameter } from "viem";
 import type {
   ChainId,
   ContractName,
-} from "$lib/runes/createDeployedContractInfo.svelte";
+} from "$lib/utils/createDeployedContractInfo.svelte";
 
 interface Props {
   contractName: ContractName<ChainId>;
@@ -82,7 +82,7 @@ async function handleWrite() {
   await writeContract.writeContract(args);
 }
 
-function parseInputValue(value: string, type: string): any {
+function parseInputValue(value: string, type: string): unknown {
   if (!value) return undefined;
 
   // Handle uint/int types

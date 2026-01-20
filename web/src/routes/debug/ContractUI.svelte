@@ -1,9 +1,9 @@
 <script lang="ts">
-import { createDeployedContractInfo } from "$lib/runes";
+import { createDeployedContractInfo } from "$lib/utils";
 import type {
   ContractName,
   ChainId,
-} from "$lib/runes/createDeployedContractInfo.svelte";
+} from "$lib/utils/createDeployedContractInfo.svelte";
 import ContractFunction from "./ContractFunction.svelte";
 import type { AbiFunction } from "viem";
 
