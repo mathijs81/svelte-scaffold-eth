@@ -1,7 +1,7 @@
 {
-  "name": "@svelte-eth-starter/foundry",
+  "name": "@svelte-scaffold-eth/foundry",
   "version": "0.1.0",
-  "description": "Foundry smart contracts for Svelte-ETH Starter",
+  "description": "Foundry smart contracts for Svelte Scaffold ETH",
   "scripts": {
     "build": "forge build",
     "test": "forge test",
@@ -16,13 +16,11 @@
     "chain:kill": "bash anvil.sh --kill",
     "chain:restart": "bash anvil.sh --restart",
     "generate": "tsx utils/generateContracts.ts",
-    "deploy": "forge script script/Deploy.s.sol --broadcast && pnpm run generate",
-    "deploy:anvil": "forge script script/Deploy.s.sol --rpc-url anvil --broadcast --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 && pnpm run generate",
-    "deploy:localhost": "forge script script/Deploy.s.sol --rpc-url localhost --broadcast --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 && pnpm run generate",
-    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url sepolia --broadcast --verify && pnpm run generate",
-    "deploy:base-sepolia": "forge script script/Deploy.s.sol --rpc-url base-sepolia --broadcast --verify && pnpm run generate",
-    "deploy:optimism-sepolia": "forge script script/Deploy.s.sol --rpc-url optimism-sepolia --broadcast --verify && pnpm run generate",
-    "deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol --rpc-url arbitrum-sepolia --broadcast --verify && pnpm run generate",
+    "deploy:anvil": "forge script script/Deploy.s.sol --rpc-url anvil --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 --broadcast && pnpm run generate",
+    "deploy:sepolia": "forge script script/Deploy.s.sol --rpc-url sepolia --private-key $PRIVATE_KEY --broadcast --verify && pnpm run generate",
+    "deploy:base-sepolia": "forge script script/Deploy.s.sol --rpc-url base-sepolia --private-key $PRIVATE_KEY --broadcast --verify && pnpm run generate",
+    "deploy:optimism-sepolia": "forge script script/Deploy.s.sol --rpc-url optimism-sepolia --private-key $PRIVATE_KEY --broadcast --verify && pnpm run generate",
+    "deploy:arbitrum-sepolia": "forge script script/Deploy.s.sol --rpc-url arbitrum-sepolia --private-key $PRIVATE_KEY --broadcast --verify && pnpm run generate",
     "verify:sepolia": "forge verify-contract <CONTRACT_ADDRESS> src/YourContract.sol:YourContract --chain sepolia --watch",
     "snapshot": "forge snapshot",
     "snapshot:diff": "forge snapshot --diff"

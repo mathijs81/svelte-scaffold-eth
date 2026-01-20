@@ -1,5 +1,5 @@
 {
-  "name": "svelte-eth-starter",
+  "name": "svelte-scaffold-eth",
   "private": true,
   "version": "0.0.1",
   "type": "module",
@@ -26,6 +26,7 @@
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.1.17",
     "@vitest/browser-playwright": "^4.0.15",
+    "phosphor-svelte": "^3.0.1",
     "playwright": "^1.57.0",
     "svelte": "^5.45.6",
     "svelte-check": "^4.3.4",
@@ -36,8 +37,8 @@
     "vitest-browser-svelte": "^2.0.1"
   },
   "dependencies": {
-    "@wagmi/core": "^2.9.0",
     "@wagmi/connectors": "^5.0.0",
+    "@wagmi/core": "^2.9.0",
     "abitype": "^1.0.0",
     "daisyui": "^5.5.14",
     "viem": "^2.21.0"
