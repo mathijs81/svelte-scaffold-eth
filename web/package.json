@@ -14,33 +14,36 @@
     "lint": "biome lint --write",
     "fix": "biome lint --write && biome format --write",
     "test:unit": "vitest",
-    "test": "npm run test:unit -- --run && npm run test:e2e",
-    "test:e2e": "playwright test"
+    "test": "pnpm run test:unit -- --run && pnpm run test:e2e",
+    "test:e2e": "playwright test",
+    "test:e2e:build-cache": "synpress",
+    "test:e2e:all": "pnpm test:e2e:build-cache && pnpm build && pnpm test:e2e"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
     "@playwright/test": "^1.57.0",
     "@sveltejs/adapter-auto": "^7.0.0",
-    "@sveltejs/kit": "^2.49.1",
-    "@sveltejs/vite-plugin-svelte": "^6.2.1",
+    "@sveltejs/kit": "^2.50.0",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "@synthetixio/synpress": "^4.1.2",
     "@tailwindcss/typography": "^0.5.19",
-    "@tailwindcss/vite": "^4.1.17",
-    "@vitest/browser-playwright": "^4.0.15",
+    "@tailwindcss/vite": "^4.1.18",
+    "@vitest/browser-playwright": "^4.0.17",
     "phosphor-svelte": "^3.0.1",
     "playwright": "^1.57.0",
-    "svelte": "^5.45.6",
-    "svelte-check": "^4.3.4",
-    "tailwindcss": "^4.1.17",
+    "svelte": "^5.47.1",
+    "svelte-check": "^4.3.5",
+    "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
-    "vite": "^7.2.6",
-    "vitest": "^4.0.15",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.17",
     "vitest-browser-svelte": "^2.0.1"
   },
   "dependencies": {
-    "@wagmi/connectors": "^5.0.0",
-    "@wagmi/core": "^2.9.0",
-    "abitype": "^1.0.0",
+    "@wagmi/connectors": "^5.11.2",
+    "@wagmi/core": "^2.22.1",
+    "abitype": "^1.2.3",
     "daisyui": "^5.5.14",
-    "viem": "^2.21.0"
+    "viem": "^2.44.4"
   }
 }

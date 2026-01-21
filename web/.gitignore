@@ -23,5 +23,7 @@ Thumbs.db
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
+.cache-synpress
+
 # Auto-generated contract deployments
 src/lib/contracts/deployedContracts.ts
