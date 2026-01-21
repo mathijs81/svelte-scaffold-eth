@@ -140,20 +140,10 @@ export function createWriteContract<TAbi extends Abi = Abi>(
 
   return {
     writeContract: write,
-    get isPending() {
-      return isPending;
-    },
-    get isConfirming() {
-      return isConfirming;
-    },
-    get isConfirmed() {
-      return isConfirmed;
-    },
-    get error() {
-      return error;
-    },
-    get hash() {
-      return hash;
-    },
+    isPending,
+    isConfirming,
+    isConfirmed,
+    error,
+    hash,
   };
 }

@@ -129,15 +129,9 @@ export function createReadContract<TAbi extends Abi = Abi>(
   }
 
   return {
-    get data() {
-      return data;
-    },
-    get isLoading() {
-      return isLoading;
-    },
-    get error() {
-      return error;
-    },
+    data,
+    isLoading,
+    error,
     refetch: fetchData,
   };
 }
