@@ -41,6 +41,7 @@ export const chains = [
  * Application-wide scaffold configuration
  */
 export const scaffoldConfig = {
+  // TODO: the target network should probably be settable from .env
   // The network on which your dApp runs
   targetNetworks: [foundry],
 

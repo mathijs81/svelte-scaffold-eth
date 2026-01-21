@@ -2,11 +2,11 @@
 import InfoIcon from "phosphor-svelte/lib/Info";
 import WarningIcon from "phosphor-svelte/lib/Warning";
 import deployedContracts from "$lib/contracts/deployedContracts";
-import { createAccount } from "$lib/utils";
+import { createAccount } from "$lib/web3";
 import type {
   ChainId,
   ContractName,
-} from "$lib/utils/createDeployedContractInfo.svelte";
+} from "$lib/web3/createDeployedContractInfo.svelte";
 import ContractUI from "./ContractUI.svelte";
 
 const account = createAccount();

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { createReadContract, createWriteContract } from "$lib/utils";
+import { createReadContract, createWriteContract } from "$lib/web3";
 import StringInput from "$lib/components/inputs/StringInput.svelte";
 import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
 import AddressInput from "$lib/components/inputs/AddressInput.svelte";
@@ -7,7 +7,7 @@ import type { AbiFunction, AbiParameter } from "viem";
 import type {
   ChainId,
   ContractName,
-} from "$lib/utils/createDeployedContractInfo.svelte";
+} from "$lib/web3/createDeployedContractInfo.svelte";
 
 interface Props {
   contractName: ContractName<ChainId>;

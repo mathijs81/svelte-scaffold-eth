@@ -1,6 +1,7 @@
 // Reactive utilities for Web3 interactions
 
-export { createAccount, createChainStats } from "./createAccount.svelte";
+export { createAccount } from "./createAccount.svelte";
+export { createNetworkInfo } from "./createNetworkInfo.svelte";
 export { createReadContract } from "./createReadContract.svelte";
 export { createWriteContract } from "./createWriteContract.svelte";
 export {

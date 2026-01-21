@@ -1,7 +1,7 @@
 <script lang="ts">
 import CodeIcon from "phosphor-svelte/lib/Code";
 import GithubLogoIcon from "phosphor-svelte/lib/GithubLogo";
-import { createAccount } from "$lib/utils";
+import { createAccount } from "$lib/web3";
 
 const account = createAccount();
 </script>

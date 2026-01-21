@@ -1,9 +1,9 @@
 <script lang="ts">
-import { createDeployedContractInfo } from "$lib/utils";
+import { createDeployedContractInfo } from "$lib/web3";
 import type {
   ContractName,
   ChainId,
-} from "$lib/utils/createDeployedContractInfo.svelte";
+} from "$lib/web3/createDeployedContractInfo.svelte";
 import ContractFunction from "./ContractFunction.svelte";
 import type { AbiFunction } from "viem";
 
