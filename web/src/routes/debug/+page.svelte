@@ -1,6 +1,6 @@
 <script lang="ts">
 import deployedContracts from "$lib/contracts/deployedContracts";
-import { createAccount } from "$lib/utils";
+import { createAccount, formatAddress } from "$lib/utils";
 import ContractUI from "./ContractUI.svelte";
 import { connect, disconnect } from "@wagmi/core";
 import { config } from "$lib/wagmi/config";
@@ -11,24 +11,29 @@ import InfoIcon from "phosphor-svelte/lib/Info";
 import type {
   ChainId,
   ContractName,
-} from "$lib/runes/createDeployedContractInfo.svelte";
+} from "$lib/utils/createDeployedContractInfo.svelte";
 
 const account = createAccount();
 
 // Get all deployed contracts for the current chain (31337 = foundry)
 // FIXME add chain chooser
-const chainId = "31337" as ChainId;
-const contracts =
-  deployedContracts[chainId as keyof typeof deployedContracts] || {};
-const contractNames = Object.keys(contracts) as ContractName<ChainId>[];
+const chainId = 31337 as ChainId;
+const contracts = $derived(deployedContracts[chainId] || {});
+const contractNames = $derived(
+  Object.keys(contracts) as ContractName<ChainId>[],
+);
 
 let connectError = $state<string | null>(null);
+let isConnecting = $state(false);
 
 async function connectWallet() {
+  if (isConnecting) return;
+
   connectError = null;
+  isConnecting = true;
   try {
     // Check if there's an injected provider
-    if (typeof window === "undefined" || !window.ethereum) {
+    if (typeof window === "undefined" || !window?.ethereum) {
       connectError =
         "No wallet detected. Please install MetaMask or another Web3 wallet.";
       return;
@@ -38,10 +43,13 @@ async function connectWallet() {
     console.error("Failed to connect wallet:", error);
     connectError =
       error instanceof Error ? error.message : "Failed to connect wallet";
+  } finally {
+    isConnecting = false;
   }
 }
 
 async function disconnectWallet() {
+  connectError = null;
   await disconnect(config);
 }
 </script>
@@ -55,15 +63,17 @@ async function disconnectWallet() {
 		<div class="flex-none gap-2">
 			{#if account.isConnected}
 				<div class="dropdown dropdown-end">
-					<div tabindex="0" role="button" class="btn btn-ghost">
-						{account.address?.slice(0, 6)}...{account.address?.slice(-4)}
-					</div>
+					<button type="button" class="btn btn-ghost">
+						{formatAddress(account.address)}
+					</button>
 					<ul class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
 						<li><button onclick={disconnectWallet}>Disconnect</button></li>
 					</ul>
 				</div>
 			{:else}
-				<button class="btn btn-primary" onclick={connectWallet}>Connect Wallet</button>
+				<button class="btn btn-primary" onclick={connectWallet} disabled={isConnecting}>
+					{isConnecting ? "Connecting..." : "Connect Wallet"}
+				</button>
 			{/if}
 		</div>
 	</div>
@@ -79,7 +89,9 @@ async function disconnectWallet() {
 	<div class="container mx-auto p-4">
 		<div class="flex flex-col gap-4">
 			<div>
-				<h1 class="text-4xl font-bold">Debug Contracts</h1>
+				<h1 class="text-4xl font-bold">
+					Debug Contracts {contractNames.length > 0 ? `(${contractNames.length})` : ""}
+				</h1>
 				<p class="text-base-content/70 mt-2">
 					Interactive UI to test all deployed contract functions
 				</p>
