@@ -1,29 +1,104 @@
 import { readContract, watchBlockNumber } from "@wagmi/core";
+import type { Abi } from "viem";
 import { config } from "$lib/wagmi/config";
 import {
-  createDeployedContractInfo,
   type ChainId,
   type ContractName,
+  createDeployedContractInfo,
 } from "./createDeployedContractInfo.svelte";
-import type { Abi } from "viem";
 
 interface ReadContractParams<TAbi extends Abi = Abi> {
-  /** Contract name from deployedContracts */
   contractName: ContractName<ChainId>;
-  /** Function name to call */
   functionName: string;
-  /** Function arguments (if any) */
   args?: readonly unknown[];
-  /** Chain ID (defaults to current chain) */
   chainId: ChainId;
-  /** Custom ABI (optional, uses deployed contract ABI by default) */
   abi?: TAbi;
-  /** Custom address (optional, uses deployed contract address by default) */
   address?: `0x${string}`;
-  /** Whether to watch for changes and auto-refetch (default: false) */
   watch?: boolean;
-  /** Polling interval in ms when watch is enabled (default: 4000) */
   pollingInterval?: number;
+}
+
+class ReadContractData<TAbi extends Abi = Abi> {
+  data = $state<unknown>(undefined);
+  isLoading = $state(true);
+  error = $state<Error | null>(null);
+
+  private contractInfo: { address: `0x${string}`; abi: Abi } | null;
+  private functionName: string;
+  private args: readonly unknown[];
+  private unwatchBlockNumber: (() => void) | undefined;
+
+  constructor(params: ReadContractParams<TAbi>) {
+    this.functionName = params.functionName;
+    this.args = params.args ?? [];
+
+    const {
+      abi: customAbi,
+      address: customAddress,
+      contractName,
+      chainId,
+    } = params;
+
+    this.contractInfo =
+      customAbi && customAddress
+        ? { address: customAddress, abi: customAbi }
+        : createDeployedContractInfo(contractName, chainId);
+
+    if (!this.contractInfo) {
+      this.error = new Error(
+        `Contract ${contractName} not found on chain ${chainId}`,
+      );
+      this.isLoading = false;
+      return;
+    }
+
+    this.fetchData();
+
+    if (params.watch) {
+      this.startWatching(params.chainId, params.pollingInterval ?? 4000);
+    }
+  }
+
+  async fetchData() {
+    if (!this.contractInfo) return;
+
+    this.isLoading = true;
+    this.error = null;
+
+    try {
+      const result = await readContract(config, {
+        address: this.contractInfo.address,
+        abi: this.contractInfo.abi,
+        functionName: this.functionName,
+        args: this.args as Parameters<typeof readContract>[1]["args"],
+      });
+      this.data = result;
+    } catch (e) {
+      this.error = e instanceof Error ? e : new Error(String(e));
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  startWatching(chainId: ChainId, pollingInterval: number) {
+    const data = this;
+    let lastBlockNumber = 0n;
+
+    this.unwatchBlockNumber = watchBlockNumber(config, {
+      chainId: parseInt(chainId, 10) as (typeof config)["chains"][number]["id"],
+      onBlockNumber(blockNumber) {
+        if (blockNumber > lastBlockNumber) {
+          lastBlockNumber = blockNumber;
+          data.fetchData();
+        }
+      },
+      pollingInterval,
+    });
+  }
+
+  stopWatching() {
+    this.unwatchBlockNumber?.();
+  }
 }
 
 /**
@@ -54,84 +129,18 @@ interface ReadContractParams<TAbi extends Abi = Abi> {
 export function createReadContract<TAbi extends Abi = Abi>(
   params: ReadContractParams<TAbi>,
 ) {
-  let data = $state<unknown>(undefined);
-  let isLoading = $state(true);
-  let error = $state<Error | null>(null);
-
-  const {
-    contractName,
-    functionName,
-    args = [],
-    chainId,
-    abi: customAbi,
-    address: customAddress,
-    watch = false,
-    pollingInterval = 4000,
-  } = params;
-
-  // Get contract info
-  const contractInfo =
-    customAbi && customAddress
-      ? { address: customAddress, abi: customAbi }
-      : createDeployedContractInfo(contractName, chainId);
-
-  if (!contractInfo) {
-    error = new Error(`Contract ${contractName} not found on chain ${chainId}`);
-    isLoading = false;
-  }
-
-  // Function to fetch data
-  async function fetchData() {
-    if (!contractInfo) return;
-
-    isLoading = true;
-    error = null;
-
-    try {
-      const result = await readContract(config, {
-        address: contractInfo.address,
-        abi: contractInfo.abi,
-        functionName,
-        args: args as Parameters<typeof readContract>[1]["args"],
-      });
-      data = result;
-    } catch (e) {
-      error = e instanceof Error ? e : new Error(String(e));
-    } finally {
-      isLoading = false;
-    }
-  }
-
-  // Initial fetch
-  fetchData();
-
-  // Set up watching with automatic cleanup
-  if (watch && contractInfo) {
-    $effect(() => {
-      let lastBlockNumber = 0n;
-
-      const unwatchBlockNumber = watchBlockNumber(config, {
-        chainId: parseInt(
-          chainId,
-          10,
-        ) as (typeof config)["chains"][number]["id"],
-        onBlockNumber(blockNumber) {
-          if (blockNumber > lastBlockNumber) {
-            lastBlockNumber = blockNumber;
-            fetchData();
-          }
-        },
-        pollingInterval,
-      });
-
-      return unwatchBlockNumber;
-    });
-  }
+  const data = new ReadContractData(params);
 
   return {
-    data,
-    isLoading,
-    error,
-    refetch: fetchData,
+    get data() {
+      return data.data;
+    },
+    get isLoading() {
+      return data.isLoading;
+    },
+    get error() {
+      return data.error;
+    },
+    refetch: () => data.fetchData(),
   };
 }

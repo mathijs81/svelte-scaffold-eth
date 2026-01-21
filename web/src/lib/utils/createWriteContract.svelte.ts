@@ -1,25 +1,100 @@
-import { writeContract, waitForTransactionReceipt } from "@wagmi/core";
+import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
+import type { Abi } from "viem";
 import { config } from "$lib/wagmi/config";
 import {
-  createDeployedContractInfo,
   type ChainId,
   type ContractName,
+  createDeployedContractInfo,
 } from "./createDeployedContractInfo.svelte";
-import type { Abi } from "viem";
 
 interface WriteContractParams<TAbi extends Abi = Abi> {
-  /** Contract name from deployedContracts */
   contractName: ContractName<ChainId>;
-  /** Function name to call */
   functionName: string;
-  /** Chain ID (defaults to current chain) */
   chainId: ChainId;
-  /** Custom ABI (optional, uses deployed contract ABI by default) */
   abi?: TAbi;
-  /** Custom address (optional, uses deployed contract address by default) */
   address?: `0x${string}`;
-  /** Value to send with transaction (in wei) */
   value?: bigint;
+}
+
+class WriteContractData<TAbi extends Abi = Abi> {
+  isPending = $state(false);
+  isConfirming = $state(false);
+  isConfirmed = $state(false);
+  error = $state<Error | null>(null);
+  hash = $state<`0x${string}` | undefined>(undefined);
+
+  private contractInfo: { address: `0x${string}`; abi: Abi } | null;
+  private functionName: string;
+  private value: bigint | undefined;
+
+  constructor(params: WriteContractParams<TAbi>) {
+    this.functionName = params.functionName;
+    this.value = params.value;
+
+    const {
+      abi: customAbi,
+      address: customAddress,
+      contractName,
+      chainId,
+    } = params;
+
+    this.contractInfo =
+      customAbi && customAddress
+        ? { address: customAddress, abi: customAbi }
+        : createDeployedContractInfo(contractName, chainId);
+
+    if (!this.contractInfo) {
+      this.error = new Error(
+        `Contract ${contractName} not found on chain ${chainId}`,
+      );
+    }
+  }
+
+  async write(args: Parameters<typeof writeContract>[1]["args"] = []) {
+    if (!this.contractInfo) {
+      this.error = new Error("Contract not found");
+      return;
+    }
+
+    this.isPending = true;
+    this.isConfirming = false;
+    this.isConfirmed = false;
+    this.error = null;
+    this.hash = undefined;
+
+    try {
+      const txHash = await writeContract(config, {
+        address: this.contractInfo.address,
+        abi: this.contractInfo.abi,
+        functionName: this.functionName,
+        args: args as Parameters<typeof writeContract>[1]["args"],
+        value: this.value,
+      });
+
+      this.hash = txHash;
+      this.isPending = false;
+      this.isConfirming = true;
+
+      await waitForTransactionReceipt(config, {
+        hash: txHash,
+        chainId: parseInt(
+          this.contractInfo.address,
+          10,
+        ) as (typeof config)["chains"][number]["id"],
+      });
+
+      this.isConfirming = false;
+      this.isConfirmed = true;
+
+      setTimeout(() => {
+        this.isConfirmed = false;
+      }, 3000);
+    } catch (e) {
+      this.error = e instanceof Error ? e : new Error(String(e));
+      this.isPending = false;
+      this.isConfirming = false;
+    }
+  }
 }
 
 /**
@@ -58,92 +133,25 @@ interface WriteContractParams<TAbi extends Abi = Abi> {
 export function createWriteContract<TAbi extends Abi = Abi>(
   params: WriteContractParams<TAbi>,
 ) {
-  let isPending = $state(false);
-  let isConfirming = $state(false);
-  let isConfirmed = $state(false);
-  let error = $state<Error | null>(null);
-  let hash = $state<`0x${string}` | undefined>(undefined);
-
-  const {
-    contractName,
-    functionName,
-    chainId,
-    abi: customAbi,
-    address: customAddress,
-    value,
-  } = params;
-
-  // Get contract info
-  const contractInfo =
-    customAbi && customAddress
-      ? { address: customAddress, abi: customAbi }
-      : createDeployedContractInfo(contractName, chainId);
-
-  if (!contractInfo) {
-    error = new Error(`Contract ${contractName} not found on chain ${chainId}`);
-  }
-
-  /**
-   * Execute the contract write
-   * @param args - Function arguments
-   */
-  async function write(args: Parameters<typeof writeContract>[1]["args"] = []) {
-    if (!contractInfo) {
-      error = new Error(
-        `Contract ${contractName} not found on chain ${chainId}`,
-      );
-      return;
-    }
-
-    isPending = true;
-    isConfirming = false;
-    isConfirmed = false;
-    error = null;
-    hash = undefined;
-
-    try {
-      // Write to contract
-      const txHash = await writeContract(config, {
-        address: contractInfo.address,
-        abi: contractInfo.abi,
-        functionName,
-        args: args as Parameters<typeof writeContract>[1]["args"],
-        value,
-      });
-
-      hash = txHash;
-      isPending = false;
-      isConfirming = true;
-
-      // Wait for transaction confirmation
-      await waitForTransactionReceipt(config, {
-        hash: txHash,
-        chainId: parseInt(
-          chainId,
-          10,
-        ) as (typeof config)["chains"][number]["id"],
-      });
-
-      isConfirming = false;
-      isConfirmed = true;
-
-      // Reset confirmed state after 3 seconds
-      setTimeout(() => {
-        isConfirmed = false;
-      }, 3000);
-    } catch (e) {
-      error = e instanceof Error ? e : new Error(String(e));
-      isPending = false;
-      isConfirming = false;
-    }
-  }
+  const data = new WriteContractData(params);
 
   return {
-    writeContract: write,
-    isPending,
-    isConfirming,
-    isConfirmed,
-    error,
-    hash,
+    writeContract: (args: Parameters<typeof writeContract>[1]["args"] = []) =>
+      data.write(args),
+    get isPending() {
+      return data.isPending;
+    },
+    get isConfirming() {
+      return data.isConfirming;
+    },
+    get isConfirmed() {
+      return data.isConfirmed;
+    },
+    get error() {
+      return data.error;
+    },
+    get hash() {
+      return data.hash;
+    },
   };
 }
