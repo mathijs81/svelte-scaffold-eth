@@ -1,8 +1,4 @@
-import {
-  getAccount,
-  reconnect,
-  watchAccount,
-} from "@wagmi/core";
+import { getAccount, reconnect, watchAccount } from "@wagmi/core";
 import { getTargetNetwork } from "$lib/wagmi/chains";
 import { config } from "$lib/wagmi/config";
 

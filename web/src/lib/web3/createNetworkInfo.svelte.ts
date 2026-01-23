@@ -9,7 +9,7 @@ import {
 import { chains } from "$lib/wagmi/chains";
 import { config } from "$lib/wagmi/config";
 
-type WagmiChain = typeof config['chains'][number]['id'];
+type WagmiChain = (typeof config)["chains"][number]["id"];
 
 // FIXME: unregistering is not done properly.
 // When e.g. switching chains, the app keeps requesting block numbers of the previous chain.

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
-import {Test, console} from "forge-std/Test.sol";
-import {YourContract} from "../src/YourContract.sol";
+import { Test, console } from "forge-std/Test.sol";
+import { YourContract } from "../src/YourContract.sol";
 
 contract YourContractTest is Test {
     YourContract public yourContract;
@@ -51,7 +51,7 @@ contract YourContractTest is Test {
         string memory newGreeting = "Premium Greeting";
 
         vm.prank(user1);
-        yourContract.setGreeting{value: 1 ether}(newGreeting);
+        yourContract.setGreeting{ value: 1 ether }(newGreeting);
 
         assertEq(yourContract.greeting(), newGreeting);
         assertEq(yourContract.premium(), true);
@@ -75,7 +75,7 @@ contract YourContractTest is Test {
         emit GreetingChange(user1, newGreeting, true, 1 ether);
 
         vm.prank(user1);
-        yourContract.setGreeting{value: 1 ether}(newGreeting);
+        yourContract.setGreeting{ value: 1 ether }(newGreeting);
     }
 
     function test_MultipleUsersSetGreeting() public {
@@ -104,7 +104,7 @@ contract YourContractTest is Test {
     function test_Withdraw() public {
         // Send ETH to contract
         vm.prank(user1);
-        yourContract.setGreeting{value: 5 ether}("Premium");
+        yourContract.setGreeting{ value: 5 ether }("Premium");
 
         uint256 ownerBalanceBefore = owner.balance;
         uint256 contractBalance = address(yourContract).balance;
@@ -119,7 +119,7 @@ contract YourContractTest is Test {
 
     function test_WithdrawRevertsForNonOwner() public {
         vm.prank(user1);
-        yourContract.setGreeting{value: 1 ether}("Premium");
+        yourContract.setGreeting{ value: 1 ether }("Premium");
 
         vm.prank(user2);
         vm.expectRevert("Not the Owner");
@@ -128,7 +128,7 @@ contract YourContractTest is Test {
 
     function test_ReceiveETH() public {
         vm.prank(user1);
-        (bool success,) = address(yourContract).call{value: 1 ether}("");
+        (bool success,) = address(yourContract).call{ value: 1 ether }("");
 
         assertTrue(success);
         assertEq(address(yourContract).balance, 1 ether);
@@ -147,7 +147,7 @@ contract YourContractTest is Test {
 
         vm.deal(user1, value);
         vm.prank(user1);
-        yourContract.setGreeting{value: value}("Fuzz test");
+        yourContract.setGreeting{ value: value }("Fuzz test");
 
         assertEq(yourContract.premium(), true);
         assertEq(address(yourContract).balance, value);

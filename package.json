@@ -1,0 +1,43 @@
+{
+  "name": "svelte-scaffold-eth-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A modern starter template for building Ethereum dApps with SvelteKit 5, Foundry, and DaisyUI",
+  "scripts": {
+    "install:all": "pnpm install",
+    "dev": "pnpm -C web dev",
+    "build": "pnpm -C foundry build && pnpm -C web build",
+    "preview": "pnpm -C web preview",
+    "chain": "pnpm -C foundry chain",
+    "chain:kill": "pnpm -C foundry chain:kill",
+    "chain:restart": "pnpm -C foundry chain:restart",
+    "deploy:anvil": "pnpm -C foundry deploy:anvil",
+    "deploy:sepolia": "pnpm -C foundry deploy:sepolia",
+    "deploy:base-sepolia": "pnpm -C foundry deploy:base-sepolia",
+    "deploy:optimism-sepolia": "pnpm -C foundry deploy:optimism-sepolia",
+    "deploy:arbitrum-sepolia": "pnpm -C foundry deploy:arbitrum-sepolia",
+    "generate": "pnpm -C foundry generate",
+    "test": "pnpm test:contracts && pnpm test:web",
+    "test:contracts": "pnpm -C foundry test",
+    "test:web": "pnpm -C web test",
+    "test:coverage": "pnpm -C foundry test:coverage",
+    "test:gas": "pnpm -C foundry test:gas",
+    "test:e2e": "pnpm -C web test:e2e",
+    "check": "pnpm -C web check",
+    "format": "pnpm -C foundry format && pnpm -C web format",
+    "lint": "pnpm -C foundry lint && pnpm -C web lint",
+    "clean": "pnpm -C foundry clean && rm -rf web/.svelte-kit web/build"
+  },
+  "keywords": [
+    "svelte",
+    "sveltekit",
+    "ethereum",
+    "foundry",
+    "wagmi",
+    "viem",
+    "daisyui",
+    "web3"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0 <0.9.0;
 
 // Useful for debugging. Remove when deploying to a live network.
-import {console} from "forge-std/console.sol";
+import { console } from "forge-std/console.sol";
 
 // Use openzeppelin to inherit battle-tested implementations (ERC20, ERC721, etc)
 // import "@openzeppelin/contracts/access/Ownable.sol";
@@ -66,12 +66,12 @@ contract YourContract {
      * The function can only be called by the owner of the contract as defined by the isOwner modifier
      */
     function withdraw() public isOwner {
-        (bool success,) = owner.call{value: address(this).balance}("");
+        (bool success,) = owner.call{ value: address(this).balance }("");
         require(success, "Failed to send Ether");
     }
 
     /**
      * Function that allows the contract to receive ETH
      */
-    receive() external payable {}
+    receive() external payable { }
 }

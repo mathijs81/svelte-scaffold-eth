@@ -35,18 +35,17 @@ mise install
 # Set up foundry/lib/forge-std submodule
 git submodule update --init --recursive
 
-# Install dependencies
-pnpm -C foundry install
-pnpm -C web install
+# Install dependencies for both foundry and web
+pnpm install
 
 # Start local Foundry node (in terminal 1)
-pnpm -C foundry chain
+pnpm chain
 
 # Deploy contracts + generate `web/src/lib/contracts/deployedContracts.ts` (in terminal 2)
-pnpm -C foundry deploy:anvil
+pnpm deploy:anvil
 
 # Start the web dev server (in terminal 3)
-pnpm -C web dev
+pnpm dev
 
 # Open http://localhost:5173
 ```
@@ -56,6 +55,49 @@ Your app is now running with:
 - Local Foundry node on `http://localhost:8545`
 - Contracts deployed via Foundry scripts (see `foundry/broadcast/`)
 - Generated contract deployment/ABI map at `web/src/lib/contracts/deployedContracts.ts`
+
+## Available Commands
+
+### Development
+```bash
+pnpm dev              # Start the frontend dev server
+pnpm chain            # Start local Anvil node
+pnpm chain:kill       # Stop the Anvil node
+pnpm chain:restart    # Restart the Anvil node
+pnpm deploy:anvil     # Deploy contracts to local chain & regenerate types
+```
+
+### Deployment
+```bash
+pnpm deploy:sepolia              # Deploy to Sepolia testnet
+pnpm deploy:base-sepolia         # Deploy to Base Sepolia
+pnpm deploy:optimism-sepolia     # Deploy to Optimism Sepolia
+pnpm deploy:arbitrum-sepolia     # Deploy to Arbitrum Sepolia
+```
+
+### Testing
+```bash
+pnpm test              # Run all tests (contracts + frontend)
+pnpm test:contracts    # Run Foundry contract tests
+pnpm test:web          # Run frontend unit + E2E tests
+pnpm test:e2e          # Run Playwright E2E tests only
+pnpm test:coverage     # Generate Foundry coverage report
+pnpm test:gas          # Run tests with gas reporting
+```
+
+### Code Quality
+```bash
+pnpm check      # Type-check frontend code
+pnpm format     # Format all code (Solidity + TypeScript/Svelte)
+pnpm lint       # Lint all code
+pnpm clean      # Clean build artifacts
+```
+
+### Building
+```bash
+pnpm build      # Build contracts and frontend for production
+pnpm preview    # Preview production build locally
+```
 
 ## Contributing
 

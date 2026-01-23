@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {Script, console} from "forge-std/Script.sol";
-import {YourContract} from "../src/YourContract.sol";
+import { Script, console } from "forge-std/Script.sol";
+import { YourContract } from "../src/YourContract.sol";
 
 /**
  * @title Deploy
