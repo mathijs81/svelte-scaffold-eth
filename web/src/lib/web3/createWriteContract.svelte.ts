@@ -1,4 +1,4 @@
-import { waitForTransactionReceipt, writeContract } from "@wagmi/core";
+import { writeContract } from "@wagmi/core";
 import type { Abi } from "viem";
 import { config } from "$lib/wagmi/config";
 import {
@@ -6,6 +6,7 @@ import {
   type ContractName,
   createDeployedContractInfo,
 } from "./createDeployedContractInfo.svelte";
+import { txWatcher } from "./txWatcher.svelte";
 
 interface WriteContractParams<TAbi extends Abi = Abi> {
   contractName: ContractName<ChainId>;
@@ -18,18 +19,20 @@ interface WriteContractParams<TAbi extends Abi = Abi> {
 
 class WriteContractData<TAbi extends Abi = Abi> {
   isPending = $state(false);
-  isConfirming = $state(false);
-  isConfirmed = $state(false);
   error = $state<Error | null>(null);
   hash = $state<`0x${string}` | undefined>(undefined);
 
   private contractInfo: { address: `0x${string}`; abi: Abi } | null;
   private functionName: string;
   private value: bigint | undefined;
+  private contractName: string;
+  private chainId: ChainId;
 
   constructor(params: WriteContractParams<TAbi>) {
     this.functionName = params.functionName;
     this.value = params.value;
+    this.contractName = params.contractName as string;
+    this.chainId = params.chainId;
 
     const {
       abi: customAbi,
@@ -57,8 +60,6 @@ class WriteContractData<TAbi extends Abi = Abi> {
     }
 
     this.isPending = true;
-    this.isConfirming = false;
-    this.isConfirmed = false;
     this.error = null;
     this.hash = undefined;
 
@@ -73,32 +74,31 @@ class WriteContractData<TAbi extends Abi = Abi> {
 
       this.hash = txHash;
       this.isPending = false;
-      this.isConfirming = true;
 
-      await waitForTransactionReceipt(config, {
-        hash: txHash,
-        chainId: parseInt(
-          this.contractInfo.address,
-          10,
-        ) as (typeof config)["chains"][number]["id"],
+      const chainIdNum = Number.parseInt(this.chainId, 10);
+      txWatcher.watch(txHash, chainIdNum, {
+        contractName: this.contractName,
+        functionName: this.functionName,
       });
 
-      this.isConfirming = false;
-      this.isConfirmed = true;
-
-      setTimeout(() => {
-        this.isConfirmed = false;
-      }, 3000);
+      return txHash;
     } catch (e) {
       this.error = e instanceof Error ? e : new Error(String(e));
       this.isPending = false;
-      this.isConfirming = false;
     }
+  }
+
+  get txState() {
+    return this.hash ? txWatcher.getTransaction(this.hash) : undefined;
   }
 }
 
 /**
  * Reactive utility to write to a contract
+ *
+ * Uses the global transaction watcher for lifecycle management.
+ * Transaction state updates (confirming, confirmed, failed) are tracked
+ * via the txState property which subscribes to the txWatcher.
  *
  * @param params - Write contract parameters
  * @returns Object with writeContract function and transaction states
@@ -106,23 +106,23 @@ class WriteContractData<TAbi extends Abi = Abi> {
  * @example
  * ```svelte
  * <script lang="ts">
- *   const { writeContract, isPending, isConfirming, isConfirmed, error, hash } =
- *     createWriteContract({
- *       contractName: 'YourContract',
- *       functionName: 'setGreeting'
- *     });
+ *   const writer = createWriteContract({
+ *     contractName: 'YourContract',
+ *     functionName: 'setGreeting',
+ *     chainId: 31337
+ *   });
  *
  *   function updateGreeting() {
- *     writeContract(['Hello from Svelte!']);
+ *     writer.write(['Hello from Svelte!']);
  *   }
  * </script>
  *
- * <button onclick={updateGreeting} disabled={isPending || isConfirming}>
- *   {#if isPending}
+ * <button onclick={updateGreeting} disabled={writer.isPending || writer.txState?.status === 'confirming'}>
+ *   {#if writer.isPending}
  *     Waiting for approval...
- *   {:else if isConfirming}
+ *   {:else if writer.txState?.status === 'confirming'}
  *     Confirming...
- *   {:else if isConfirmed}
+ *   {:else if writer.txState?.status === 'confirmed'}
  *     Confirmed!
  *   {:else}
  *     Update Greeting
@@ -136,22 +136,19 @@ export function createWriteContract<TAbi extends Abi = Abi>(
   const data = new WriteContractData(params);
 
   return {
-    writeContract: (args: Parameters<typeof writeContract>[1]["args"] = []) =>
+    write: (args: Parameters<typeof writeContract>[1]["args"] = []) =>
       data.write(args),
     get isPending() {
       return data.isPending;
-    },
-    get isConfirming() {
-      return data.isConfirming;
-    },
-    get isConfirmed() {
-      return data.isConfirmed;
     },
     get error() {
       return data.error;
     },
     get hash() {
       return data.hash;
+    },
+    get txState() {
+      return data.txState;
     },
   };
 }

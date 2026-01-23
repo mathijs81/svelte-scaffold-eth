@@ -1,5 +1,9 @@
 <script lang="ts">
-import { createReadContract, createWriteContract } from "$lib/web3";
+import {
+  createReadContract,
+  createWriteContract,
+  getTransactionUrl,
+} from "$lib/web3";
 import StringInput from "$lib/components/inputs/StringInput.svelte";
 import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
 import AddressInput from "$lib/components/inputs/AddressInput.svelte";
@@ -19,7 +23,6 @@ interface Props {
 let { contractName, chainId, functionAbi, isReadFunction }: Props = $props();
 
 // State for function inputs
-//let inputValues = $state.raw<Record<string, string>>({});
 let inputValues = $state.raw({} as Record<string, string>);
 
 // Initialize input values for each parameter
@@ -36,13 +39,12 @@ $effect(() => {
   }
 });
 
-// For read functions, create a reactive read contract
 let readResult = $state<ReturnType<typeof createReadContract> | null>(null);
 
-// For write functions, create a write contract (initialized once with prop values)
-// These props define the component identity and won't change during its lifetime
+// Initialized once with props - component identity won't change during its lifetime
+// Transaction lifecycle managed by txWatcher, toasts by TransactionToastHandler
 // svelte-ignore state_referenced_locally
-const writeContract = !isReadFunction
+const writer = !isReadFunction
   ? createWriteContract({
       contractName,
       functionName: functionAbi.name,
@@ -69,7 +71,7 @@ function handleRead() {
 }
 
 async function handleWrite() {
-  if (!writeContract) return;
+  if (!writer) return;
 
   // Parse input values to appropriate types
   const args =
@@ -79,7 +81,7 @@ async function handleWrite() {
       return parseInputValue(value, input.type);
     }) || [];
 
-  await writeContract.writeContract(args);
+  await writer.write(args);
 }
 
 function parseInputValue(value: string, type: string): unknown {
@@ -166,13 +168,13 @@ let isExpanded = $state(false);
 					<button
 						class="btn btn-primary"
 						onclick={handleWrite}
-						disabled={writeContract?.isPending || writeContract?.isConfirming}
+						disabled={writer?.isPending || writer?.txState?.status === 'confirming'}
 					>
-						{#if writeContract?.isPending}
+						{#if writer?.isPending}
 							Waiting for approval...
-						{:else if writeContract?.isConfirming}
+						{:else if writer?.txState?.status === 'confirming'}
 							Confirming...
-						{:else if writeContract?.isConfirmed}
+						{:else if writer?.txState?.status === 'confirmed'}
 							Confirmed! ✓
 						{:else}
 							Write
@@ -197,18 +199,41 @@ let isExpanded = $state(false);
 				{/if}
 			{/if}
 
-			{#if !isReadFunction && writeContract}
-				{#if writeContract.error}
+			{#if !isReadFunction && writer}
+				{#if writer.error}
 					<div class="divider">Error</div>
 					<div class="alert alert-error">
-						<span>{writeContract.error.message}</span>
+						<span>{writer.error.message}</span>
 					</div>
-				{:else if writeContract.hash}
+				{:else if writer.hash && writer.txState}
 					<div class="divider">Transaction</div>
-					<div class="alert alert-success">
+					<div class="alert" class:alert-info={writer.txState.status === 'confirming'} class:alert-success={writer.txState.status === 'confirmed'} class:alert-error={writer.txState.status === 'failed'}>
 						<div class="flex flex-col gap-1">
-							<span>Transaction Hash:</span>
-							<code class="text-xs">{writeContract.hash}</code>
+							<div class="flex items-center gap-2">
+								<span>Status:</span>
+								<span class="badge" class:badge-info={writer.txState.status === 'confirming'} class:badge-success={writer.txState.status === 'confirmed'} class:badge-error={writer.txState.status === 'failed'}>
+									{writer.txState.status}
+								</span>
+							</div>
+							<div class="flex items-center gap-1 flex-wrap">
+								<span>Hash:</span>
+								<code class="text-xs">{writer.hash}</code>
+								{#if getTransactionUrl(writer.hash, writer.txState.chainId)}
+									<a
+										href={getTransactionUrl(writer.hash, writer.txState.chainId)}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="link link-primary text-xs"
+									>
+										View on Explorer ↗
+									</a>
+								{/if}
+							</div>
+							{#if writer.txState.error}
+								<div class="text-error text-sm mt-1">
+									{writer.txState.error.message}
+								</div>
+							{/if}
 						</div>
 					</div>
 				{/if}

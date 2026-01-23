@@ -52,7 +52,7 @@ async function disconnectWallet() {
     {/if}
     {#if account.isConnected}
       <div class="dropdown dropdown-end">
-        <button type="button" tabindex="0" role="button" class="btn btn-sm bg-base-200 hover:bg-base-300 h-fit py-1">
+        <button type="button" tabindex="0" class="btn btn-sm bg-base-200 hover:bg-base-300 h-fit py-1">
           {#if network.balance !== undefined && network.balanceCurrency}
             <span class="opacity-70 text-xs">{(Number(network.balance) / 1e18).toFixed(3)}</span>
           {/if}

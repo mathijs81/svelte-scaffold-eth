@@ -20,6 +20,9 @@ importers:
       daisyui:
         specifier: ^5.5.14
         version: 5.5.14
+      svelte-sonner:
+        specifier: ^1.0.7
+        version: 1.0.7(svelte@5.47.0)
       viem:
         specifier: ^2.21.0
         version: 2.44.4(bufferutil@4.1.0)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.3.5)
@@ -1927,6 +1930,11 @@ packages:
     engines: {node: '>=18.0.0', npm: '>=8.0.0'}
     hasBin: true
 
+  runed@0.28.0:
+    resolution: {integrity: sha512-k2xx7RuO9hWcdd9f+8JoBeqWtYrm5CALfgpkg2YDB80ds/QE4w0qqu34A7fqiAwiBBSBQOid7TLxwxVC27ymWQ==}
+    peerDependencies:
+      svelte: ^5.7.0
+
   sade@1.8.1:
     resolution: {integrity: sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==}
     engines: {node: '>=6'}
@@ -2033,6 +2041,11 @@ packages:
     peerDependencies:
       svelte: ^4.0.0 || ^5.0.0-next.0
       typescript: '>=5.0.0'
+
+  svelte-sonner@1.0.7:
+    resolution: {integrity: sha512-1EUFYmd7q/xfs2qCHwJzGPh9n5VJ3X6QjBN10fof2vxgy8fYE7kVfZ7uGnd7i6fQaWIr5KvXcwYXE/cmTEjk5A==}
+    peerDependencies:
+      svelte: ^5.0.0
 
   svelte@5.47.0:
     resolution: {integrity: sha512-LRhAvzhvb4lHLNAcAMJZ2ifUSOif8OuItF4khbssrIeitj01GjpumeeauSnCeAGnSI+X6P2R3Z7S4c5STv4iQQ==}
@@ -5019,6 +5032,11 @@ snapshots:
       '@rollup/rollup-win32-x64-msvc': 4.55.2
       fsevents: 2.3.3
 
+  runed@0.28.0(svelte@5.47.0):
+    dependencies:
+      esm-env: 1.2.2
+      svelte: 5.47.0
+
   sade@1.8.1:
     dependencies:
       mri: 1.2.0
@@ -5131,6 +5149,11 @@ snapshots:
       typescript: 5.9.3
     transitivePeerDependencies:
       - picomatch
+
+  svelte-sonner@1.0.7(svelte@5.47.0):
+    dependencies:
+      runed: 0.28.0(svelte@5.47.0)
+      svelte: 5.47.0
 
   svelte@5.47.0:
     dependencies:

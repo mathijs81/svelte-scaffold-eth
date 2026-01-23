@@ -41,6 +41,7 @@
     "@wagmi/core": "^2.9.0",
     "abitype": "^1.0.0",
     "daisyui": "^5.5.14",
+    "svelte-sonner": "^1.0.7",
     "viem": "^2.21.0"
   }
 }
