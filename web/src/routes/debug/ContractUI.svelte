@@ -1,15 +1,13 @@
 <script lang="ts">
+import type { ContractName, DeployedChains } from "$lib/utils/types";
 import { createDeployedContractInfo } from "$lib/web3";
-import type {
-  ContractName,
-  ChainId,
-} from "$lib/web3/createDeployedContractInfo.svelte";
+
 import ContractFunction from "./ContractFunction.svelte";
 import type { AbiFunction } from "viem";
 
 interface Props {
-  contractName: ContractName<ChainId>;
-  chainId: ChainId;
+  contractName: ContractName<DeployedChains>;
+  chainId: DeployedChains;
 }
 
 let { contractName, chainId }: Props = $props();

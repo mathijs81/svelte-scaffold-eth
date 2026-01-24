@@ -1,20 +1,18 @@
 <script lang="ts">
-import InfoIcon from "phosphor-svelte/lib/Info";
-import WarningIcon from "phosphor-svelte/lib/Warning";
 import deployedContracts from "$lib/contracts/deployedContracts";
 import { createAccount } from "$lib/web3";
-import type {
-  ChainId,
-  ContractName,
-} from "$lib/web3/createDeployedContractInfo.svelte";
+import type {} from "$lib/web3/createDeployedContractInfo.svelte";
+import InfoIcon from "phosphor-svelte/lib/Info";
+import WarningIcon from "phosphor-svelte/lib/Warning";
 import ContractUI from "./ContractUI.svelte";
+import type { ContractName, DeployedChains } from "$lib/utils/types";
 
 const account = createAccount();
 
-const chainId = 31337 as unknown as ChainId;
+const chainId = 31337;
 const contracts = $derived(deployedContracts[chainId] || {});
 const contractNames = $derived(
-  Object.keys(contracts) as ContractName<ChainId>[],
+  Object.keys(contracts) as ContractName<DeployedChains>[],
 );
 </script>
 

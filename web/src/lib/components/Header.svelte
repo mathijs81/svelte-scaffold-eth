@@ -1,13 +1,23 @@
 <script lang="ts">
+import { useBalance, useBlockNumber } from "$lib/query";
+import { config } from "$lib/wagmi/config";
+import { createAccount } from "$lib/web3";
 import { injected } from "@wagmi/connectors";
 import { connect, disconnect } from "@wagmi/core";
 import XCircleIcon from "phosphor-svelte/lib/XCircle";
-import { createAccount, createNetworkInfo } from "$lib/web3";
-import { config } from "$lib/wagmi/config";
 import NetworkMismatchAlert from "./NetworkMismatchAlert.svelte";
 
 const account = createAccount();
-const network = createNetworkInfo();
+
+const balance = useBalance(account.address as `0x${string}` | undefined, {
+  watch: "block",
+});
+const blockNumber = useBlockNumber({ watch: "interval", interval: 4000 });
+
+const chainName = $derived(
+  config.chains.find((chain) => chain.id === account.chainId)?.name ??
+    "Unsupported chain",
+);
 
 let connectError = $state<string | null>(null);
 let isConnecting = $state(false);
@@ -44,17 +54,21 @@ async function disconnectWallet() {
     <a href="/" class="btn btn-ghost text-xl">Svelte Scaffold ETH</a>
   </div>
   <div class="flex gap-3 items-baseline">
-    {#if network.chainName}
+    {#if chainName}
       <div class="flex items-baseline gap-1.5 text-sm">
-        <span class="opacity-70">{network.chainName}</span>
-        <span class="font-mono text-xs opacity-50">#{network.blockNumber?.toLocaleString()}</span>
+        <span class="opacity-70">{chainName}</span>
+        <span class="font-mono text-xs opacity-50">
+          #{blockNumber.data ? blockNumber.data.toLocaleString() : '...'}
+        </span>
       </div>
     {/if}
     {#if account.isConnected}
       <div class="dropdown dropdown-end">
         <button type="button" tabindex="0" class="btn btn-sm bg-base-200 hover:bg-base-300 h-fit py-1">
-          {#if network.balance !== undefined && network.balanceCurrency}
-            <span class="opacity-70 text-xs">{(Number(network.balance) / 1e18).toFixed(3)}</span>
+          {#if balance.data}
+            <span class="opacity-70 text-xs">
+              {(Number(balance.data.value) / 10 ** balance.data.decimals).toFixed(3)} {balance.data.symbol}
+            </span>
           {/if}
           <span class="font-mono">{account.address?.slice(0, 6)}...{account.address?.slice(-4)}</span>
         </button>

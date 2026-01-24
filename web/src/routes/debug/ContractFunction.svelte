@@ -1,21 +1,15 @@
 <script lang="ts">
-import {
-  createReadContract,
-  createWriteContract,
-  getTransactionUrl,
-} from "$lib/web3";
-import StringInput from "$lib/components/inputs/StringInput.svelte";
-import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
 import AddressInput from "$lib/components/inputs/AddressInput.svelte";
-import type { AbiFunction, AbiParameter } from "viem";
-import type {
-  ChainId,
-  ContractName,
-} from "$lib/web3/createDeployedContractInfo.svelte";
+import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
+import StringInput from "$lib/components/inputs/StringInput.svelte";
+import { useContractRead, useContractWrite } from "$lib/query";
+import type { ContractName, DeployedChains } from "$lib/utils/types";
+import { getTransactionUrl } from "$lib/web3";
+import type { AbiFunction } from "viem";
 
 interface Props {
-  contractName: ContractName<ChainId>;
-  chainId: ChainId;
+  contractName: ContractName<DeployedChains>;
+  chainId: DeployedChains;
   functionAbi: AbiFunction;
   isReadFunction: boolean;
 }
@@ -39,21 +33,37 @@ $effect(() => {
   }
 });
 
-let readResult = $state<ReturnType<typeof createReadContract> | null>(null);
+// For reads: track whether user has triggered a read and what args to use
+let readTriggered = $state(false);
+let readArgs = $state<readonly unknown[]>([]);
 
-// Initialized once with props - component identity won't change during its lifetime
-// Transaction lifecycle managed by txWatcher, toasts by TransactionToastHandler
-// svelte-ignore state_referenced_locally
-const writer = !isReadFunction
-  ? createWriteContract({
-      contractName,
-      functionName: functionAbi.name,
-      chainId,
-    })
-  : null;
+// Create read query (enabled only when triggered)
+const readQuery = $derived(
+  isReadFunction
+    ? useContractRead({
+        contract: contractName,
+        functionName: functionAbi.name,
+        args: readArgs,
+        chainId,
+        watch: "manual",
+        enabled: readTriggered,
+      })
+    : null,
+);
+
+// For writes: create mutation upfront
+const writeMutation = $derived(
+  !isReadFunction
+    ? useContractWrite({
+        contract: contractName,
+        functionName: functionAbi.name,
+        chainId: chainId,
+        invalidateKeys: [["readContract"]],
+      })
+    : null,
+);
 
 function handleRead() {
-  // Parse input values to appropriate types
   const args =
     functionAbi.inputs?.map((input, index) => {
       const key = input.name || `arg${index}`;
@@ -61,19 +71,14 @@ function handleRead() {
       return parseInputValue(value, input.type);
     }) || [];
 
-  // Create read contract with parsed args
-  readResult = createReadContract({
-    contractName,
-    functionName: functionAbi.name,
-    args,
-    chainId,
-  });
+  readArgs = args;
+  readTriggered = true;
+  readQuery?.refetch();
 }
 
-async function handleWrite() {
-  if (!writer) return;
+function handleWrite() {
+  if (!writeMutation) return;
 
-  // Parse input values to appropriate types
   const args =
     functionAbi.inputs?.map((input, index) => {
       const key = input.name || `arg${index}`;
@@ -81,7 +86,7 @@ async function handleWrite() {
       return parseInputValue(value, input.type);
     }) || [];
 
-  await writer.write(args);
+  writeMutation.mutate({ args });
 }
 
 function parseInputValue(value: string, type: string): unknown {
@@ -163,19 +168,17 @@ let isExpanded = $state(false);
 			<!-- Action button -->
 			<div class="flex gap-2">
 				{#if isReadFunction}
-					<button class="btn btn-primary" onclick={handleRead}>Read</button>
-				{:else}
+					<button class="btn btn-primary" onclick={handleRead} disabled={readQuery?.isFetching}>
+						{readQuery?.isFetching ? 'Reading...' : 'Read'}
+					</button>
+				{:else if writeMutation}
 					<button
 						class="btn btn-primary"
 						onclick={handleWrite}
-						disabled={writer?.isPending || writer?.txState?.status === 'confirming'}
+						disabled={writeMutation.isPending}
 					>
-						{#if writer?.isPending}
-							Waiting for approval...
-						{:else if writer?.txState?.status === 'confirming'}
-							Confirming...
-						{:else if writer?.txState?.status === 'confirmed'}
-							Confirmed! ✓
+						{#if writeMutation.isPending}
+							Sending transaction...
 						{:else}
 							Write
 						{/if}
@@ -184,43 +187,41 @@ let isExpanded = $state(false);
 			</div>
 
 			<!-- Results -->
-			{#if isReadFunction && readResult}
+			{#if isReadFunction && readQuery && readTriggered}
 				<div class="divider">Result</div>
-				{#if readResult.isLoading}
+				{#if readQuery.isFetching}
 					<div class="loading loading-spinner loading-sm"></div>
-				{:else if readResult.error}
+				{:else if readQuery.error}
 					<div class="alert alert-error">
-						<span>{readResult.error.message}</span>
+						<span>{readQuery.error.message}</span>
 					</div>
-				{:else if readResult.data !== undefined}
+				{:else if readQuery.data !== undefined}
 					<div class="mockup-code">
-						<pre><code>{JSON.stringify(readResult.data, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2)}</code></pre>
+						<pre><code>{JSON.stringify(readQuery.data, (_, v) => typeof v === 'bigint' ? v.toString() : v, 2)}</code></pre>
 					</div>
 				{/if}
 			{/if}
 
-			{#if !isReadFunction && writer}
-				{#if writer.error}
+			{#if !isReadFunction && writeMutation}
+				{#if writeMutation.error}
 					<div class="divider">Error</div>
 					<div class="alert alert-error">
-						<span>{writer.error.message}</span>
+						<span>{writeMutation.error.message}</span>
 					</div>
-				{:else if writer.hash && writer.txState}
+				{:else if writeMutation.data}
 					<div class="divider">Transaction</div>
-					<div class="alert" class:alert-info={writer.txState.status === 'confirming'} class:alert-success={writer.txState.status === 'confirmed'} class:alert-error={writer.txState.status === 'failed'}>
+					<div class="alert alert-info">
 						<div class="flex flex-col gap-1">
 							<div class="flex items-center gap-2">
 								<span>Status:</span>
-								<span class="badge" class:badge-info={writer.txState.status === 'confirming'} class:badge-success={writer.txState.status === 'confirmed'} class:badge-error={writer.txState.status === 'failed'}>
-									{writer.txState.status}
-								</span>
+								<span class="badge badge-info">Sent</span>
 							</div>
 							<div class="flex items-center gap-1 flex-wrap">
 								<span>Hash:</span>
-								<code class="text-xs">{writer.hash}</code>
-								{#if getTransactionUrl(writer.hash, writer.txState.chainId)}
+								<code class="text-xs">{writeMutation.data as string}</code>
+								{#if getTransactionUrl(writeMutation.data, chainId)}
 									<a
-										href={getTransactionUrl(writer.hash, writer.txState.chainId)}
+										href={getTransactionUrl(writeMutation.data, chainId)}
 										target="_blank"
 										rel="noopener noreferrer"
 										class="link link-primary text-xs"
@@ -229,11 +230,6 @@ let isExpanded = $state(false);
 									</a>
 								{/if}
 							</div>
-							{#if writer.txState.error}
-								<div class="text-error text-sm mt-1">
-									{writer.txState.error.message}
-								</div>
-							{/if}
 						</div>
 					</div>
 				{/if}

@@ -1,7 +1,4 @@
 export { createAccount } from "./createAccount.svelte";
-export { createNetworkInfo } from "./createNetworkInfo.svelte";
-export { createReadContract } from "./createReadContract.svelte";
-export { createWriteContract } from "./createWriteContract.svelte";
 export {
   createDeployedContractInfo,
   getAllDeployedContracts,

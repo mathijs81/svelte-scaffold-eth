@@ -7,6 +7,9 @@
 [x] Renamed createChainStats → createNetworkInfo for clarity
 [x] Renamed ChainSwitchWarning → NetworkMismatchAlert for better semantics
 [x] When doing a transaction, not only the txID should be shown but should also track the status and report success/failure
+[x] Reactive utilities need to be improved for unregistering (do ref counting?)
+[ ] Finish migration off lib/web3 reactive utils to tanstack query-based code
+[ ] Minimize code in routes, everything in components (for easier testing in vitest)
 
 [ ] No tests yet
-[ ] Reactive utilities need to be improved for unregistering (do ref counting?)
+

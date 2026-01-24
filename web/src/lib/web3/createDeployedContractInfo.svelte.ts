@@ -1,13 +1,6 @@
 import deployedContracts from "$lib/contracts/deployedContracts";
+import type { ContractName, DeployedChains } from "$lib/utils/types";
 import type { Abi } from "viem";
-
-/**
- * Type helper to extract contract names from deployedContracts
- */
-export type DeployedContracts = typeof deployedContracts;
-export type ChainId = keyof DeployedContracts;
-export type ContractName<TChainId extends ChainId> =
-  keyof DeployedContracts[TChainId];
 
 /**
  * Get deployed contract info (address and ABI) for a specific chain
@@ -28,11 +21,10 @@ export type ContractName<TChainId extends ChainId> =
  * ```
  */
 export function createDeployedContractInfo(
-  contractName: ContractName<ChainId>,
-  chainId: ChainId,
+  contractName: ContractName<DeployedChains>,
+  chainId: DeployedChains,
 ) {
-  const chainData =
-    deployedContracts[chainId as keyof typeof deployedContracts];
+  const chainData = deployedContracts[chainId];
   if (!chainData) {
     return null;
   }
@@ -54,8 +46,8 @@ export function createDeployedContractInfo(
  * @param chainId - Chain ID to get contracts from
  * @returns Object with all contracts for that chain
  */
-export function getAllDeployedContracts<TChainId extends ChainId>(
+export function getAllDeployedContracts<TChainId extends DeployedChains>(
   chainId: TChainId,
 ) {
-  return deployedContracts[chainId] || null;
+  return deployedContracts[`${chainId}`] || null;
 }
