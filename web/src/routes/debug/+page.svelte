@@ -1,13 +1,9 @@
 <script lang="ts">
 import deployedContracts from "$lib/contracts/deployedContracts";
-import { createAccount } from "$lib/web3";
-import type {} from "$lib/web3/createDeployedContractInfo.svelte";
-import InfoIcon from "phosphor-svelte/lib/Info";
-import WarningIcon from "phosphor-svelte/lib/Warning";
-import ContractUI from "./ContractUI.svelte";
+import ContractList from "$lib/components/ContractList.svelte";
+import WalletWarning from "$lib/components/WalletWarning.svelte";
+import NoContractsAlert from "$lib/components/NoContractsAlert.svelte";
 import type { ContractName, DeployedChains } from "$lib/utils/types";
-
-const account = createAccount();
 
 const chainId = 31337;
 const contracts = $derived(deployedContracts[chainId] || {});
@@ -27,24 +23,12 @@ const contractNames = $derived(
       </p>
     </div>
 
-    {#if !account.isConnected}
-      <div class="alert alert-warning">
-        <WarningIcon class="shrink-0 h-6 w-6" />
-        <span>Please connect your wallet to interact with contracts</span>
-      </div>
-    {/if}
+    <WalletWarning />
 
     {#if contractNames.length === 0}
-      <div class="alert alert-info">
-        <InfoIcon class="shrink-0 w-6 h-6" />
-        <span>No contracts deployed on chain {chainId}. Run `pnpm -C foundry deploy:anvil` to deploy contracts.</span>
-      </div>
+      <NoContractsAlert {chainId} />
     {:else}
-      <div class="grid grid-cols-1 gap-6">
-        {#each contractNames as contractName (contractName)}
-          <ContractUI {contractName} {chainId} />
-        {/each}
-      </div>
+      <ContractList {chainId} />
     {/if}
   </div>
 </div>

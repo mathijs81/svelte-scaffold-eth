@@ -18,7 +18,7 @@
     "test:e2e": "playwright test"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.3.11",
+    "@biomejs/biome": "^2.3.12",
     "@playwright/test": "^1.58.0",
     "@sveltejs/adapter-auto": "^7.0.0",
     "@sveltejs/kit": "^2.50.1",
@@ -27,9 +27,9 @@
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/svelte-query-devtools": "^6.0.3",
     "@vitest/browser-playwright": "^4.0.18",
-    "phosphor-svelte": "^3.0.1",
+    "phosphor-svelte": "^3.1.0",
     "playwright": "^1.58.0",
-    "svelte": "^5.48.0",
+    "svelte": "^5.48.2",
     "svelte-check": "^4.3.5",
     "tailwindcss": "^4.1.18",
     "typescript": "^5.9.3",
@@ -38,12 +38,12 @@
     "vitest-browser-svelte": "^2.0.2"
   },
   "dependencies": {
-    "@tanstack/svelte-query": "^6.0.17",
+    "@tanstack/svelte-query": "^6.0.18",
     "@wagmi/connectors": "^7.1.5",
     "@wagmi/core": "^3.3.1",
     "abitype": "^1.2.3",
     "daisyui": "^5.5.14",
     "svelte-sonner": "^1.0.7",
-    "viem": "^2.44.4"
+    "viem": "^2.45.0"
   }
 }
