@@ -1,9 +1,9 @@
 <script lang="ts">
 import CodeIcon from "phosphor-svelte/lib/Code";
 import GithubLogoIcon from "phosphor-svelte/lib/GithubLogo";
-import { createAccount } from "$lib/web3";
+import { createConnection } from "$lib/web3";
 
-const account = createAccount();
+const connection = createConnection();
 </script>
 
 <div class="hero min-h-[calc(100vh-4rem)]">
@@ -27,13 +27,13 @@ const account = createAccount();
         </a>
       </div>
 
-      {#if account.isConnected}
+      {#if connection.isConnected}
         <div class="mt-8">
           <div class="stats shadow">
             <div class="stat">
               <div class="stat-title">Connected Address</div>
-              <div class="stat-value text-lg font-mono">{account.address?.slice(0, 10)}...{account.address?.slice(-8)}</div>
-              <div class="stat-desc">Chain ID: {account.chainId}</div>
+              <div class="stat-value text-lg font-mono">{connection.address?.slice(0, 10)}...{connection.address?.slice(-8)}</div>
+              <div class="stat-desc">Chain ID: {connection.chainId}</div>
             </div>
           </div>
         </div>

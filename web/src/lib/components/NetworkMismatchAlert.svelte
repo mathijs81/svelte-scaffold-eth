@@ -3,9 +3,9 @@ import { switchChain } from "@wagmi/core";
 import WarningIcon from "phosphor-svelte/lib/Warning";
 import { config } from "$lib/wagmi/config";
 import { getTargetNetwork } from "$lib/wagmi/chains";
-import { createAccount } from "$lib/web3";
+import { createConnection } from "$lib/web3";
 
-const account = createAccount();
+const connection = createConnection();
 const targetNetwork = getTargetNetwork();
 
 let isSwitchingChain = $state(false);
@@ -28,7 +28,7 @@ async function handleSwitchChain() {
 }
 </script>
 
-{#if account.isWrongChain}
+{#if connection.isWrongChain}
   <div class="alert alert-warning mx-4 mt-2">
     <WarningIcon class="shrink-0 h-6 w-6" />
     <span>

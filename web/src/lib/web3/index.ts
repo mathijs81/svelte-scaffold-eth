@@ -1,4 +1,4 @@
-export { createAccount } from "./createAccount.svelte";
+export { createConnection } from "./createConnection.svelte";
 export {
   createDeployedContractInfo,
   getAllDeployedContracts,

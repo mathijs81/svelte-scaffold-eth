@@ -1,21 +1,21 @@
 <script lang="ts">
 import { useBalance, useBlockNumber } from "$lib/query";
 import { config } from "$lib/wagmi/config";
-import { createAccount } from "$lib/web3";
+import { createConnection } from "$lib/web3";
 import { injected } from "@wagmi/connectors";
 import { connect, disconnect } from "@wagmi/core";
 import XCircleIcon from "phosphor-svelte/lib/XCircle";
 import NetworkMismatchAlert from "./NetworkMismatchAlert.svelte";
 
-const account = createAccount();
+const connection = createConnection();
 
-const balance = useBalance(account.address as `0x${string}` | undefined, {
+const balance = useBalance(connection.address as `0x${string}` | undefined, {
   watch: "block",
 });
 const blockNumber = useBlockNumber({ watch: "interval", interval: 4000 });
 
 const chainName = $derived(
-  config.chains.find((chain) => chain.id === account.chainId)?.name ??
+  config.chains.find((chain) => chain.id === connection.chainId)?.name ??
     "Unsupported chain",
 );
 
@@ -62,7 +62,7 @@ async function disconnectWallet() {
         </span>
       </div>
     {/if}
-    {#if account.isConnected}
+    {#if connection.isConnected}
       <div class="dropdown dropdown-end">
         <button type="button" tabindex="0" class="btn btn-sm bg-base-200 hover:bg-base-300 h-fit py-1">
           {#if balance.data}
@@ -70,7 +70,7 @@ async function disconnectWallet() {
               {(Number(balance.data.value) / 10 ** balance.data.decimals).toFixed(3)} {balance.data.symbol}
             </span>
           {/if}
-          <span class="font-mono">{account.address?.slice(0, 6)}...{account.address?.slice(-4)}</span>
+          <span class="font-mono">{connection.address?.slice(0, 6)}...{connection.address?.slice(-4)}</span>
         </button>
         <ul class="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
           <li><button onclick={disconnectWallet}>Disconnect</button></li>
