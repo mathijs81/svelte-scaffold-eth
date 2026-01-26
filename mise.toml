@@ -1,2 +1,4 @@
 [tools]
 foundry = "latest"
+node = "latest"
+pnpm = "latest"

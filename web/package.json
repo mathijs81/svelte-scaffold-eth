@@ -14,7 +14,7 @@
     "lint": "biome lint --write",
     "fix": "biome lint --write && biome format --write",
     "test:unit": "vitest",
-    "test": "npm run test:unit -- --run && npm run test:e2e",
+    "test": "pnpm test:unit -- --run && pnpm test:e2e",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

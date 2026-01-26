@@ -22,7 +22,6 @@
     "test:web": "pnpm -C web test",
     "test:coverage": "pnpm -C foundry test:coverage",
     "test:gas": "pnpm -C foundry test:gas",
-    "test:e2e": "pnpm -C web test:e2e",
     "check": "pnpm -C web check",
     "format": "pnpm -C foundry format && pnpm -C web format",
     "lint": "pnpm -C foundry lint && pnpm -C web lint",

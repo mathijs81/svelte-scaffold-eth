@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install tools through mise (takes care of foundry, node, pnpm)
+      - name: Install tools through mise
+        uses: jdx/mise-action@v3
+                  
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+            web/node_modules
+            foundry/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+            
+      - name: Cache Foundry dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.foundry
+          key: ${{ runner.os }}-foundry-${{ hashFiles('foundry.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-foundry-
+            
+      - name: Install dependencies
+        run: pnpm install:all
+
+      - name: Build Foundry contracts
+        run: pnpm -C foundry build
+        
+      - name: Generate contract types
+        run: pnpm generate
+
+      - name: Lint
+        run: pnpm -C web lint
+        
+      - name: Type check
+        run: pnpm check        
+                
+      - name: Run contract tests
+        run: pnpm test:contracts
+        
+      - name: Build web application
+        run: pnpm -C web build
+        
+      - name: Install Playwright browsers
+        run: pnpm -C web exec playwright install --with-deps
+
+      - name: Run web tests
+        run: pnpm test:web
+
