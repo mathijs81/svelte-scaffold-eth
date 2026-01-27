@@ -25,3 +25,5 @@ vite.config.ts.timestamp-*
 
 # Auto-generated contract deployments
 src/lib/contracts/deployedContracts.ts
+
+coverage

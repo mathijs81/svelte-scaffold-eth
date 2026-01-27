@@ -6,7 +6,7 @@ import { chains } from "./chains";
  * Wagmi configuration for Web3 connections
  * Uses @wagmi/core (framework-agnostic) instead of React wagmi
  */
-export const config = createConfig({
+export let config = createConfig({
   chains: chains,
   connectors: [
     injected(),
@@ -34,6 +34,10 @@ export const config = createConfig({
     80002: http(), // Polygon Amoy
   },
 });
+
+export function updateConfigForTest(newConfig: Config) {
+  config = newConfig;
+}
 
 /**
  * Type helper to extract the config type

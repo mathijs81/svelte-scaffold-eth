@@ -1,5 +1,5 @@
 <script lang="ts">
-import WarningIcon from "phosphor-svelte/lib/Warning";
+import WarningIcon from "phosphor-svelte/lib/WarningIcon";
 import { createConnection } from "$lib/web3";
 
 const connection = createConnection();

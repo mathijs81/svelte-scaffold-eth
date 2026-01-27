@@ -2,9 +2,8 @@
 import { useBalance, useBlockNumber } from "$lib/query";
 import { config } from "$lib/wagmi/config";
 import { createConnection } from "$lib/web3";
-import { injected } from "@wagmi/connectors";
 import { connect, disconnect } from "@wagmi/core";
-import XCircleIcon from "phosphor-svelte/lib/XCircle";
+import XCircleIcon from "phosphor-svelte/lib/XCircleIcon";
 import NetworkMismatchAlert from "./NetworkMismatchAlert.svelte";
 
 const connection = createConnection();
@@ -28,12 +27,8 @@ async function connectWallet() {
   connectError = null;
   isConnecting = true;
   try {
-    if (typeof window === "undefined" || !window?.ethereum) {
-      connectError =
-        "No wallet detected. Please install MetaMask or another Web3 wallet.";
-      return;
-    }
-    await connect(config, { connector: injected() });
+    // TODO: implement modal to choose connector in case of multiple connectors?
+    await connect(config, { connector: config.connectors[0] });
   } catch (error: unknown) {
     console.error("Failed to connect wallet:", error);
     connectError =

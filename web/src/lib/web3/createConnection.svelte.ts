@@ -67,3 +67,7 @@ export function createConnection() {
   }
   return connectionData;
 }
+
+export function resetConnectionForTest() {
+  connectionData = undefined;
+}

@@ -9,6 +9,7 @@ import {
 } from "@tanstack/svelte-query";
 import { waitForTransactionReceiptQueryOptions } from "@wagmi/core/query";
 import type { Abi, TransactionReceipt } from "viem";
+import { getGlobalClient } from "./globalClient";
 
 export interface UseContractWriteOptions {
   contract: `0x${string}` | ContractName<DeployedChains>;
@@ -124,13 +125,15 @@ export function useContractWrite(options: UseContractWriteOptions) {
 }
 
 export function useTransactionReceipt(hash: `0x${string}` | undefined) {
-  return createQuery(() =>
-    waitForTransactionReceiptQueryOptions(config, {
-      hash,
-      query: {
-        enabled: !!hash,
-        staleTime: Number.POSITIVE_INFINITY,
-      },
-    }),
+  return createQuery(
+    () =>
+      waitForTransactionReceiptQueryOptions(config, {
+        hash,
+        query: {
+          enabled: !!hash,
+          staleTime: Number.POSITIVE_INFINITY,
+        },
+      }),
+    getGlobalClient(),
   );
 }

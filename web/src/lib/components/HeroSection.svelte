@@ -1,6 +1,6 @@
 <script lang="ts">
-import CodeIcon from "phosphor-svelte/lib/Code";
-import GithubLogoIcon from "phosphor-svelte/lib/GithubLogo";
+import CodeIcon from "phosphor-svelte/lib/CodeIcon";
+import GithubLogoIcon from "phosphor-svelte/lib/GithubLogoIcon";
 import { createConnection } from "$lib/web3";
 
 const connection = createConnection();

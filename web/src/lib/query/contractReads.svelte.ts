@@ -5,6 +5,7 @@ import { createQuery } from "@tanstack/svelte-query";
 import { readContractQueryOptions } from "@wagmi/core/query";
 import type { Abi } from "viem";
 import { queryConfig, type UpdateStrategy } from "./config";
+import { getGlobalClient } from "./globalClient";
 
 export interface UseContractReadOptions {
   contract: `0x${string}` | ContractName<DeployedChains>;
@@ -57,18 +58,20 @@ export function useContractRead(options: UseContractReadOptions) {
       ? (options.interval ?? queryConfig.defaultInterval)
       : false;
 
-  return createQuery(() =>
-    readContractQueryOptions(config, {
-      address: contractAddress,
-      abi: contractAbi,
-      functionName: options.functionName,
-      args: options.args,
-      chainId: options.chainId,
-      query: {
-        enabled: options.enabled ?? true,
-        refetchInterval,
-        staleTime: options.staleTime,
-      },
-    }),
+  return createQuery(
+    () =>
+      readContractQueryOptions(config, {
+        address: contractAddress,
+        abi: contractAbi,
+        functionName: options.functionName,
+        args: options.args,
+        chainId: options.chainId,
+        query: {
+          enabled: options.enabled ?? true,
+          refetchInterval,
+          staleTime: options.staleTime,
+        },
+      }),
+    getGlobalClient(),
   );
 }

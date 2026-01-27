@@ -19,7 +19,7 @@
     "generate": "pnpm -C foundry generate",
     "test": "pnpm test:contracts && pnpm test:web",
     "test:contracts": "pnpm -C foundry test",
-    "test:web": "pnpm -C web test",
+    "test:web": "pnpm chain && pnpm deploy:anvil && pnpm -C web test",
     "test:coverage": "pnpm -C foundry test:coverage",
     "test:gas": "pnpm -C foundry test:gas",
     "check": "pnpm -C web check",

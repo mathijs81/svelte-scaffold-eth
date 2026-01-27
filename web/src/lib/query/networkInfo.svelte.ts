@@ -8,6 +8,7 @@ import {
 } from "@wagmi/core/query";
 import type { Address } from "viem";
 import { queryConfig, type UpdateStrategy } from "./config";
+import { getGlobalClient } from "./globalClient";
 
 /**
  * Hook to get the native balance of an address
@@ -48,15 +49,17 @@ export function useBalance(
     return false;
   });
 
-  return createQuery(() =>
-    getBalanceQueryOptions(config, {
-      address,
-      chainId: options?.chainId,
-      query: {
-        enabled: !!address,
-        refetchInterval,
-      },
-    }),
+  return createQuery(
+    () =>
+      getBalanceQueryOptions(config, {
+        address,
+        chainId: options?.chainId,
+        query: {
+          enabled: !!address,
+          refetchInterval,
+        },
+      }),
+    getGlobalClient(),
   );
 }
 
@@ -97,13 +100,15 @@ export function useBlockNumber(options?: {
     return false;
   });
 
-  return createQuery(() =>
-    getBlockNumberQueryOptions(config, {
-      chainId: options?.chainId,
-      query: {
-        refetchInterval,
-      },
-    }),
+  return createQuery(
+    () =>
+      getBlockNumberQueryOptions(config, {
+        chainId: options?.chainId,
+        query: {
+          refetchInterval,
+        },
+      }),
+    getGlobalClient(),
   );
 }
 
@@ -144,17 +149,19 @@ export function useBlock(options?: {
     return false;
   });
 
-  return createQuery(() =>
-    getBlockQueryOptions(config, {
-      blockNumber: options?.blockNumber,
-      blockHash: options?.blockHash,
-      chainId: options?.chainId,
-      query: {
-        refetchInterval,
-        enabled: !!(options?.blockNumber || options?.blockHash),
-      },
-      // biome-ignore lint/suspicious/noExplicitAny: blockHash doesn't seem to be exposed in getBlockQueryOptions
-    } as any),
+  return createQuery(
+    () =>
+      getBlockQueryOptions(config, {
+        blockNumber: options?.blockNumber,
+        blockHash: options?.blockHash,
+        chainId: options?.chainId,
+        query: {
+          refetchInterval,
+          enabled: !!(options?.blockNumber || options?.blockHash),
+        },
+        // biome-ignore lint/suspicious/noExplicitAny: blockHash doesn't seem to be exposed in getBlockQueryOptions
+      } as any),
+    getGlobalClient(),
   );
 }
 
