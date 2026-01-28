@@ -45,8 +45,8 @@ jobs:
       - name: Build Foundry contracts
         run: pnpm -C foundry build
         
-      - name: Generate contract types
-        run: pnpm generate
+      - name: Generate contract types (after a deploy)
+        run: pnpm chain && pnpm deploy:anvil && pnpm generate
 
       - name: Lint
         run: pnpm -C web lint
