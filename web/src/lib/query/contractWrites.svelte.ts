@@ -1,16 +1,10 @@
+import type { ContractName } from "$lib/contracts/deployedContracts";
 import type { WagmiChain } from "$lib/utils/types";
 import { config } from "$lib/wagmi/config";
 import { createDeployedContractInfo } from "$lib/web3/createDeployedContractInfo.svelte";
 import { txWatcher } from "$lib/web3/txWatcher.svelte";
-import {
-  createMutation,
-  createQuery,
-  useQueryClient,
-} from "@tanstack/svelte-query";
-import { waitForTransactionReceiptQueryOptions } from "@wagmi/core/query";
+import { createMutation, useQueryClient } from "@tanstack/svelte-query";
 import type { Abi, TransactionReceipt } from "viem";
-import { getGlobalClient } from "./globalClient";
-import type { ContractName } from "$lib/contracts/deployedContracts";
 
 export interface UseContractWriteOptions {
   contract: `0x${string}` | ContractName;
@@ -123,18 +117,4 @@ export function useContractWrite(options: UseContractWriteOptions) {
       options.onError?.(error);
     },
   }));
-}
-
-export function useTransactionReceipt(hash: `0x${string}` | undefined) {
-  return createQuery(
-    () =>
-      waitForTransactionReceiptQueryOptions(config, {
-        hash,
-        query: {
-          enabled: !!hash,
-          staleTime: Number.POSITIVE_INFINITY,
-        },
-      }),
-    getGlobalClient(),
-  );
 }

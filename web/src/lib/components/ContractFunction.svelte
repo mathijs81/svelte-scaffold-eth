@@ -2,9 +2,9 @@
 import AddressInput from "$lib/components/inputs/AddressInput.svelte";
 import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
 import StringInput from "$lib/components/inputs/StringInput.svelte";
+import TransactionStatus from "$lib/components/TransactionStatus.svelte";
 import { useContractRead, useContractWrite } from "$lib/query";
 import type { ContractName, WagmiChain } from "$lib/utils/types";
-import { getTransactionUrl } from "$lib/web3";
 import type { AbiFunction } from "viem";
 
 interface Props {
@@ -210,28 +210,7 @@ let isExpanded = $state(false);
 					</div>
 				{:else if writeMutation.data}
 					<div class="divider">Transaction</div>
-					<div class="alert alert-info">
-						<div class="flex flex-col gap-1">
-							<div class="flex items-center gap-2">
-								<span>Status:</span>
-								<span class="badge badge-info">Sent</span>
-							</div>
-							<div class="flex items-center gap-1 flex-wrap">
-								<span>Hash:</span>
-								<code class="text-xs">{writeMutation.data as string}</code>
-								{#if getTransactionUrl(writeMutation.data, chainId)}
-									<a
-										href={getTransactionUrl(writeMutation.data, chainId)}
-										target="_blank"
-										rel="noopener noreferrer"
-										class="link link-primary text-xs"
-									>
-										View on Explorer ↗
-									</a>
-								{/if}
-							</div>
-						</div>
-					</div>
+					<TransactionStatus hash={writeMutation.data} {chainId} />
 				{/if}
 			{/if}
 		</div>

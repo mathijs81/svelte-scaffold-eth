@@ -11,7 +11,7 @@ import {
 onMount(() => {
   const handleTxChange = (tx: TxState) => {
     switch (tx.status) {
-      case "confirming":
+      case "pending":
         toastTransaction(tx.hash, tx.chainId);
         break;
       case "confirmed":

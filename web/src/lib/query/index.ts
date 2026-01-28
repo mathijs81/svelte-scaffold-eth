@@ -24,7 +24,6 @@ export {
 // Contract writes
 export {
   useContractWrite,
-  useTransactionReceipt,
   type UseContractWriteOptions,
 } from "./contractWrites.svelte";
 

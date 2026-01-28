@@ -2,7 +2,7 @@ import { waitForTransactionReceipt } from "@wagmi/core";
 import { config } from "$lib/wagmi/config";
 import { SvelteMap } from "svelte/reactivity";
 
-export type TxStatus = "pending" | "confirming" | "confirmed" | "failed";
+export type TxStatus = "pending" | "confirmed" | "failed";
 
 export interface TxState {
   hash: `0x${string}`;
@@ -52,7 +52,7 @@ class TxWatcherService {
     const txState: TxState = {
       hash,
       chainId,
-      status: "confirming",
+      status: "pending",
       timestamp: Date.now(),
       ...metadata,
     };
@@ -97,9 +97,7 @@ class TxWatcherService {
   }
 
   get pending(): TxState[] {
-    return this.all.filter(
-      (tx) => tx.status === "pending" || tx.status === "confirming",
-    );
+    return this.all.filter((tx) => tx.status === "pending");
   }
 
   clear(hash: `0x${string}`) {
