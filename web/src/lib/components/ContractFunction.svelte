@@ -16,20 +16,28 @@ interface Props {
 
 let { contractName, chainId, functionAbi, isReadFunction }: Props = $props();
 
+const inputKeys = $derived(
+  functionAbi.inputs?.map((input, index) => ({
+    key: input.name || `arg${index}`,
+    type: input.type,
+  })) ?? []
+);
+
+const inputKeysSignature = $derived(inputKeys.map(({ key }) => key).join(","));
+
 // State for function inputs
 let inputValues = $state.raw({} as Record<string, string>);
+let initializedForSignature = $state("");
 
-// Initialize input values for each parameter
+// Initialize/reset input values when function signature changes
 $effect(() => {
-  const initial: Record<string, string> = {};
-  functionAbi.inputs?.forEach((input, index) => {
-    const key = input.name || `arg${index}`;
-    if (inputValues[key] === undefined) {
-      initial[key] = "";
+  if (initializedForSignature !== inputKeysSignature) {
+    initializedForSignature = inputKeysSignature;
+    const newValues: Record<string, string> = {};
+    for (const { key } of inputKeys) {
+      newValues[key] = "";
     }
-  });
-  if (Object.keys(initial).length > 0) {
-    inputValues = { ...initial, ...inputValues };
+    inputValues = newValues;
   }
 });
 
@@ -145,7 +153,7 @@ let isExpanded = $state(false);
 			<!-- Function inputs -->
 			{#if functionAbi.inputs && functionAbi.inputs.length > 0}
 				<div class="space-y-2">
-					{#each functionAbi.inputs as input, index}
+					{#each functionAbi.inputs as input, index (input.name || `arg${index}`)}
 						{@const key = input.name || `arg${index}`}
 						{@const Component = getInputComponent(input.type)}
 						<div class="form-control">
