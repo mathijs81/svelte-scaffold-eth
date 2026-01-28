@@ -1,6 +1,9 @@
-import deployedContracts from "$lib/contracts/deployedContracts";
-import type { ContractName, DeployedChains } from "$lib/utils/types";
-import type { Abi } from "viem";
+import {
+  deployedContracts,
+  type ContractInfo,
+  type ContractName,
+} from "$lib/contracts/deployedContracts";
+import type { WagmiChain } from "$lib/utils/types";
 
 /**
  * Get deployed contract info (address and ABI) for a specific chain
@@ -21,22 +24,23 @@ import type { Abi } from "viem";
  * ```
  */
 export function createDeployedContractInfo(
-  contractName: ContractName<DeployedChains>,
-  chainId: DeployedChains,
+  contractName: ContractName,
+  chainId: WagmiChain,
 ) {
-  const chainData = deployedContracts[chainId];
-  if (!chainData) {
+  const contractInfo: ContractInfo | undefined =
+    deployedContracts[contractName];
+  if (!contractInfo) {
     return null;
   }
 
-  const contract = chainData[contractName as keyof typeof chainData];
-  if (!contract) {
+  const contractAddress = contractInfo.deployments[chainId];
+  if (!contractAddress) {
     return null;
   }
 
   return {
-    address: contract.address as `0x${string}`,
-    abi: contract.abi as Abi,
+    address: contractAddress,
+    abi: contractInfo.abi,
   };
 }
 
@@ -44,10 +48,14 @@ export function createDeployedContractInfo(
  * Get all deployed contracts for a specific chain
  *
  * @param chainId - Chain ID to get contracts from
- * @returns Object with all contracts for that chain
+ * @returns Object with the contract names for that chain
  */
-export function getAllDeployedContracts<TChainId extends DeployedChains>(
-  chainId: TChainId,
-) {
-  return deployedContracts[`${chainId}`] || null;
+export function getAllDeployedContracts(
+  chainId: WagmiChain,
+): Record<ContractName, ContractInfo> {
+  return Object.fromEntries(
+    Object.entries(deployedContracts).filter(
+      ([_, info]) => info.deployments[chainId],
+    ),
+  );
 }

@@ -3,13 +3,13 @@ import AddressInput from "$lib/components/inputs/AddressInput.svelte";
 import IntegerInput from "$lib/components/inputs/IntegerInput.svelte";
 import StringInput from "$lib/components/inputs/StringInput.svelte";
 import { useContractRead, useContractWrite } from "$lib/query";
-import type { ContractName, DeployedChains } from "$lib/utils/types";
+import type { ContractName, WagmiChain } from "$lib/utils/types";
 import { getTransactionUrl } from "$lib/web3";
 import type { AbiFunction } from "viem";
 
 interface Props {
-  contractName: ContractName<DeployedChains>;
-  chainId: DeployedChains;
+  contractName: ContractName;
+  chainId: WagmiChain;
   functionAbi: AbiFunction;
   isReadFunction: boolean;
 }

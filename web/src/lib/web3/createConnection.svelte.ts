@@ -1,11 +1,12 @@
 import { getConnection, reconnect, watchConnection } from "@wagmi/core";
-import { getTargetNetwork } from "$lib/wagmi/chains";
+import { getTargetNetwork, targetChainId } from "$lib/wagmi/chains";
 import { config } from "$lib/wagmi/config";
+import type { WagmiChain } from "$lib/utils/types";
 
 class ConnectionData {
   address = $state<string | undefined>(undefined);
   isConnected = $state(false);
-  chainId = $state<number | undefined>(undefined);
+  chainId = $state<WagmiChain>(targetChainId);
   status = $state<"connecting" | "connected" | "disconnected" | "reconnecting">(
     "disconnected",
   );
@@ -20,7 +21,7 @@ class ConnectionData {
     const initialConnection = getConnection(config);
     this.address = initialConnection.address;
     this.isConnected = initialConnection.isConnected;
-    this.chainId = initialConnection.chainId;
+    this.chainId = (initialConnection.chainId as WagmiChain) ?? targetChainId;
     this.status = initialConnection.status;
   }
 
@@ -30,7 +31,7 @@ class ConnectionData {
       onChange(connection) {
         data.address = connection.address;
         data.isConnected = connection.isConnected;
-        data.chainId = connection.chainId;
+        data.chainId = (connection.chainId as WagmiChain) ?? targetChainId;
         data.status = connection.status;
       },
     });

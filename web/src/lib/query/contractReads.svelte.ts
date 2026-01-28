@@ -1,4 +1,4 @@
-import type { ContractName, DeployedChains } from "$lib/utils/types";
+import type { WagmiChain } from "$lib/utils/types";
 import { config } from "$lib/wagmi/config";
 import { createDeployedContractInfo } from "$lib/web3/createDeployedContractInfo.svelte";
 import { createQuery } from "@tanstack/svelte-query";
@@ -6,13 +6,14 @@ import { readContractQueryOptions } from "@wagmi/core/query";
 import type { Abi } from "viem";
 import { queryConfig, type UpdateStrategy } from "./config";
 import { getGlobalClient } from "./globalClient";
+import type { ContractName } from "$lib/contracts/deployedContracts";
 
 export interface UseContractReadOptions {
-  contract: `0x${string}` | ContractName<DeployedChains>;
+  contract: `0x${string}` | ContractName;
   abi?: Abi;
   functionName: string;
   args?: readonly unknown[];
-  chainId: DeployedChains;
+  chainId: WagmiChain;
   watch?: UpdateStrategy | boolean;
   interval?: number;
   enabled?: boolean;
@@ -34,7 +35,7 @@ export function useContractRead(options: UseContractReadOptions) {
     contractAbi = options.abi;
   } else {
     const contract = createDeployedContractInfo(
-      options.contract as ContractName<DeployedChains>,
+      options.contract,
       options.chainId,
     );
     if (!contract) {

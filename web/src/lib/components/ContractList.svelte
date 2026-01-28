@@ -1,22 +1,26 @@
 <script lang="ts">
-import deployedContracts from "$lib/contracts/deployedContracts";
+import { type ContractName } from "$lib/contracts/deployedContracts";
+import type { WagmiChain } from "$lib/utils/types";
+import { getAllDeployedContracts } from "$lib/web3";
 import ContractUI from "./ContractUI.svelte";
-import type { ContractName, DeployedChains } from "$lib/utils/types";
+import NoContractsAlert from "./NoContractsAlert.svelte";
 
 interface Props {
-  chainId: DeployedChains;
+  chainId: WagmiChain;
 }
 
 let { chainId }: Props = $props();
 
-const contracts = $derived(deployedContracts[chainId] || {});
-const contractNames = $derived(
-  Object.keys(contracts) as ContractName<DeployedChains>[],
-);
+const contracts = $derived(getAllDeployedContracts(chainId));
+const contractNames = $derived(Object.keys(contracts) as ContractName[]);
 </script>
 
-<div class="grid grid-cols-1 gap-6">
-  {#each contractNames as contractName (contractName)}
-    <ContractUI {contractName} {chainId} />
-  {/each}
-</div>
+{#if contractNames.length === 0}
+  <NoContractsAlert {chainId} />
+{:else}
+  <div class="grid grid-cols-1 gap-6">
+    {#each contractNames as contractName (contractName)}
+      <ContractUI {contractName} {chainId} />
+    {/each}
+  </div>
+{/if}

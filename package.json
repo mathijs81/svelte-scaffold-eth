@@ -16,7 +16,7 @@
     "deploy:base-sepolia": "pnpm -C foundry deploy:base-sepolia",
     "deploy:optimism-sepolia": "pnpm -C foundry deploy:optimism-sepolia",
     "deploy:arbitrum-sepolia": "pnpm -C foundry deploy:arbitrum-sepolia",
-    "generate": "pnpm -C foundry generate",
+    "generate": "pnpm -C web generate",
     "test": "pnpm test:contracts && pnpm test:web",
     "test:contracts": "pnpm -C foundry test",
     "test:web": "pnpm chain && pnpm deploy:anvil && pnpm -C web test",

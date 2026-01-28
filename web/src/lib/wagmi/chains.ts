@@ -1,3 +1,4 @@
+import type { WagmiChain } from "$lib/utils/types";
 import * as viemChains from "viem/chains";
 
 /**
@@ -67,3 +68,4 @@ export const scaffoldConfig = {
  * Get the target network (first network in targetNetworks array)
  */
 export const getTargetNetwork = () => scaffoldConfig.targetNetworks[0];
+export const targetChainId = scaffoldConfig.targetNetworks[0].id as WagmiChain;

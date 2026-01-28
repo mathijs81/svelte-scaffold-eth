@@ -1,4 +1,4 @@
-import type { ContractName, DeployedChains } from "$lib/utils/types";
+import type { WagmiChain } from "$lib/utils/types";
 import { config } from "$lib/wagmi/config";
 import { createDeployedContractInfo } from "$lib/web3/createDeployedContractInfo.svelte";
 import { txWatcher } from "$lib/web3/txWatcher.svelte";
@@ -10,12 +10,13 @@ import {
 import { waitForTransactionReceiptQueryOptions } from "@wagmi/core/query";
 import type { Abi, TransactionReceipt } from "viem";
 import { getGlobalClient } from "./globalClient";
+import type { ContractName } from "$lib/contracts/deployedContracts";
 
 export interface UseContractWriteOptions {
-  contract: `0x${string}` | ContractName<DeployedChains>;
+  contract: `0x${string}` | ContractName;
   abi?: Abi;
   functionName?: string;
-  chainId: DeployedChains;
+  chainId: WagmiChain;
   invalidateKeys?: string[][];
   waitForConfirmation?: boolean;
   confirmations?: number;
@@ -43,7 +44,7 @@ export function useContractWrite(options: UseContractWriteOptions) {
     contractName = undefined;
   } else {
     const contract = createDeployedContractInfo(
-      options.contract as ContractName<DeployedChains>,
+      options.contract,
       options.chainId,
     );
     if (!contract) {
