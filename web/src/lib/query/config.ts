@@ -72,6 +72,7 @@ export function createBlockchainQueryClient() {
         refetchOnWindowFocus: false,
         retry: 3,
         retryOnMount: false,
+        refetchInterval: queryConfig.defaultInterval,
       },
       mutations: {
         retry: 1,

@@ -4,6 +4,8 @@ import { createDeployedContractInfo } from "$lib/web3";
 
 import ContractFunction from "./ContractFunction.svelte";
 import type { AbiFunction } from "viem";
+import EventTable from "./EventTable.svelte";
+import { formatAddress } from "$lib/utils/format";
 
 interface Props {
   contractName: ContractName;
@@ -42,7 +44,7 @@ let activeTab = $state<"read" | "write">("read");
 			<h2 class="card-title text-2xl">
 				{contractName}
 				<div class="badge badge-secondary">
-					{contractInfo.address.slice(0, 6)}...{contractInfo.address.slice(-4)}
+					{formatAddress(contractInfo.address)}
 				</div>
 			</h2>
 
@@ -94,6 +96,10 @@ let activeTab = $state<"read" | "write">("read");
 					{/if}
 				{/if}
 			</div>
+
+			<div class="divider"></div>
+			<h3 class="text-xl">Events</h3>
+			<EventTable {contractInfo} {chainId}/>
 		</div>
 	</div>
 {:else}

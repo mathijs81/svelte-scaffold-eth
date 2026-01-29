@@ -4,6 +4,12 @@ import {
   type ContractName,
 } from "$lib/contracts/deployedContracts";
 import type { WagmiChain } from "$lib/utils/types";
+import type { Abi } from "abitype";
+
+export interface DeployedContractInfo {
+  address: `0x${string}`;
+  abi: Abi;
+}
 
 /**
  * Get deployed contract info (address and ABI) for a specific chain
@@ -26,7 +32,7 @@ import type { WagmiChain } from "$lib/utils/types";
 export function createDeployedContractInfo(
   contractName: ContractName,
   chainId: WagmiChain,
-) {
+): DeployedContractInfo | null {
   const contractInfo: ContractInfo | undefined =
     deployedContracts[contractName];
   if (!contractInfo) {

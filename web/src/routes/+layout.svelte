@@ -8,10 +8,12 @@ import { QueryClientProvider } from "@tanstack/svelte-query";
 import { createBlockchainQueryClient, setupBlockWatcher } from "$lib/query";
 import { onDestroy, type Component } from "svelte";
 import { dev } from "$app/environment";
+import { setGlobalClient } from "$lib/query/globalClient";
 
 let { children } = $props();
 
 const queryClient = createBlockchainQueryClient();
+setGlobalClient(queryClient);
 
 const unwatchBlocks = setupBlockWatcher(queryClient);
 onDestroy(unwatchBlocks);

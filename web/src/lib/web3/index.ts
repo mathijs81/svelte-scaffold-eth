@@ -14,9 +14,3 @@ export {
   getAddressUrl,
   getBlockUrl,
 } from "./utils";
-
-// Returns "0x1234...5678" format
-export function formatAddress(address: string | undefined): string {
-  if (!address) return "";
-  return `${address.slice(0, 6)}...${address.slice(-4)}`;
-}

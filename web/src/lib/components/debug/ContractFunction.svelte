@@ -20,7 +20,7 @@ const inputKeys = $derived(
   functionAbi.inputs?.map((input, index) => ({
     key: input.name || `arg${index}`,
     type: input.type,
-  })) ?? []
+  })) ?? [],
 );
 
 const inputKeysSignature = $derived(inputKeys.map(({ key }) => key).join(","));
