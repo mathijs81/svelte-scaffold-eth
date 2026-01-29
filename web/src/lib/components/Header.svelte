@@ -11,7 +11,7 @@ const connection = createConnection();
 const balance = useBalance(connection.address as `0x${string}` | undefined, {
   watch: true,
 });
-const blockNumber = useBlockNumber({ watch: true, staleTime: 0 });
+const blockNumber = useBlockNumber({ watch: true });
 
 const chainName = $derived(
   config.chains.find((chain) => chain.id === connection.chainId)?.name ??

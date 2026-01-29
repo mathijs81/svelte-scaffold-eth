@@ -95,6 +95,7 @@ export function useBlockNumber(options?: {
         chainId: options?.chainId,
         query: {
           refetchInterval,
+          staleTime: 0,
         },
       }),
     getGlobalClient(),
