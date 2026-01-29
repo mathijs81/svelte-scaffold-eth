@@ -12,19 +12,10 @@ interface Props {
 
 let { contractName, chainId }: Props = $props();
 
-// Contract info is initialized once with prop values
-// These props define the component identity and won't change during its lifetime
 const contractInfo = $derived(
   createDeployedContractInfo(contractName, chainId),
 );
 
-$effect(() => {
-  if (!contractInfo) {
-    console.error(`Contract ${contractName} not found on chain ${chainId}`);
-  }
-});
-
-// Separate read and write functions from the ABI
 const readFunctions = $derived(
   contractInfo?.abi.filter(
     (item): item is AbiFunction =>

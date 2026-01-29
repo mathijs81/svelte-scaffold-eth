@@ -1,6 +1,6 @@
 <script lang="ts">
-import HeroSection from "$lib/components/HeroSection.svelte";
-import FeatureCards from "$lib/components/FeatureCards.svelte";
+import HeroSection from "$lib/components/home/HeroSection.svelte";
+import FeatureCards from "$lib/components/home/FeatureCards.svelte";
 </script>
 
 <HeroSection />

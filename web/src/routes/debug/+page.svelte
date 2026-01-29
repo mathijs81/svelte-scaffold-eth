@@ -1,5 +1,5 @@
 <script lang="ts">
-import ContractList from "$lib/components/ContractList.svelte";
+import ContractList from "$lib/components/debug/ContractList.svelte";
 import WalletWarning from "$lib/components/WalletWarning.svelte";
 import { createConnection } from "$lib/web3";
 

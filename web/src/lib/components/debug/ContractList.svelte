@@ -1,5 +1,5 @@
 <script lang="ts">
-import { type ContractName } from "$lib/contracts/deployedContracts";
+import type { ContractName } from "$lib/contracts/deployedContracts";
 import type { WagmiChain } from "$lib/utils/types";
 import { getAllDeployedContracts } from "$lib/web3";
 import ContractUI from "./ContractUI.svelte";

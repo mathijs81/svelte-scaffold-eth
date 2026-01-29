@@ -25,11 +25,9 @@ const inputKeys = $derived(
 
 const inputKeysSignature = $derived(inputKeys.map(({ key }) => key).join(","));
 
-// State for function inputs
 let inputValues = $state.raw({} as Record<string, string>);
 let initializedForSignature = $state("");
 
-// Initialize/reset input values when function signature changes
 $effect(() => {
   if (initializedForSignature !== inputKeysSignature) {
     initializedForSignature = inputKeysSignature;
@@ -41,11 +39,9 @@ $effect(() => {
   }
 });
 
-// For reads: track whether user has triggered a read and what args to use
 let readTriggered = $state(false);
 let readArgs = $state<readonly unknown[]>([]);
 
-// Create read query (enabled only when triggered)
 const readQuery = $derived(
   isReadFunction
     ? useContractRead({
@@ -59,7 +55,6 @@ const readQuery = $derived(
     : null,
 );
 
-// For writes: create mutation upfront
 const writeMutation = $derived(
   !isReadFunction
     ? useContractWrite({
@@ -100,27 +95,22 @@ function handleWrite() {
 function parseInputValue(value: string, type: string): unknown {
   if (!value) return undefined;
 
-  // Handle uint/int types
   if (type.startsWith("uint") || type.startsWith("int")) {
     return BigInt(value);
   }
 
-  // Handle boolean
   if (type === "bool") {
     return value === "true" || value === "1";
   }
 
-  // Handle address
   if (type === "address") {
     return value as `0x${string}`;
   }
 
-  // Handle bytes
   if (type.startsWith("bytes")) {
     return value as `0x${string}`;
   }
 
-  // Default: return as string
   return value;
 }
 
@@ -131,7 +121,6 @@ function getInputComponent(type: string) {
   if (type === "address") {
     return AddressInput;
   }
-  // Default to string input
   return StringInput;
 }
 
@@ -150,7 +139,6 @@ let isExpanded = $state(false);
 	</div>
 	<div class="collapse-content">
 		<div class="space-y-4">
-			<!-- Function inputs -->
 			{#if functionAbi.inputs && functionAbi.inputs.length > 0}
 				<div class="space-y-2">
 					{#each functionAbi.inputs as input, index (input.name || `arg${index}`)}
@@ -173,7 +161,6 @@ let isExpanded = $state(false);
 				</div>
 			{/if}
 
-			<!-- Action button -->
 			<div class="flex gap-2">
 				{#if isReadFunction}
 					<button class="btn btn-primary" onclick={handleRead} disabled={readQuery?.isFetching}>
@@ -194,7 +181,6 @@ let isExpanded = $state(false);
 				{/if}
 			</div>
 
-			<!-- Results -->
 			{#if isReadFunction && readQuery && readTriggered}
 				<div class="divider">Result</div>
 				{#if readQuery.isFetching}
