@@ -6,7 +6,6 @@ import TransactionToastHandler from "$lib/components/TransactionToastHandler.sve
 import { Toaster } from "svelte-sonner";
 import { QueryClientProvider } from "@tanstack/svelte-query";
 import { createBlockchainQueryClient } from "$lib/query/config";
-import { setupBlockWatcher } from "$lib/query/blockWatcher.svelte";
 import { onDestroy, type Component } from "svelte";
 import { dev } from "$app/environment";
 import { setGlobalClient } from "$lib/query/globalClient";
@@ -15,9 +14,6 @@ let { children } = $props();
 
 const queryClient = createBlockchainQueryClient();
 setGlobalClient(queryClient);
-
-const unwatchBlocks = setupBlockWatcher(queryClient);
-onDestroy(unwatchBlocks);
 
 // Lazy load devtools in development
 let SvelteQueryDevtools = $state<Component | undefined>(undefined);

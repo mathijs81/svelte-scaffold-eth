@@ -9,9 +9,9 @@ import NetworkMismatchAlert from "./NetworkMismatchAlert.svelte";
 const connection = createConnection();
 
 const balance = useBalance(connection.address as `0x${string}` | undefined, {
-  watch: "block",
+  watch: true,
 });
-const blockNumber = useBlockNumber({ watch: "interval", interval: 4000 });
+const blockNumber = useBlockNumber({ watch: true, staleTime: 0 });
 
 const chainName = $derived(
   config.chains.find((chain) => chain.id === connection.chainId)?.name ??

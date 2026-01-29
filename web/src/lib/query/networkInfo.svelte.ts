@@ -7,8 +7,8 @@ import {
   getBlockQueryOptions,
 } from "@wagmi/core/query";
 import type { Address } from "viem";
-import { queryConfig, type UpdateStrategy } from "./config";
 import { getGlobalClient } from "./globalClient";
+import { DEFAULT_WATCH_INTERVAL } from "./config";
 
 /**
  * Hook to get the native balance of an address
@@ -23,28 +23,22 @@ import { getGlobalClient } from "./globalClient";
 export function useBalance(
   address: Address | undefined,
   options?: {
-    watch?: UpdateStrategy | boolean;
-    interval?: number;
+    /**
+     * Enable polling for this query
+     * - false: no polling (default, relies on block watcher)
+     * - true: poll at default interval (4s)
+     * - number: poll at specific interval in milliseconds
+     */
+    watch?: boolean | number;
     chainId?: WagmiChain;
   },
 ) {
-  // Determine update strategy
-  const updateStrategy = $derived.by((): UpdateStrategy => {
-    if (options?.watch === undefined) {
-      return queryConfig.defaultStrategy;
-    }
-    if (options.watch === true) {
-      return "interval";
-    }
-    if (options.watch === false) {
-      return "manual";
-    }
-    return options.watch;
-  });
-
   const refetchInterval = $derived.by(() => {
-    if (updateStrategy === "interval") {
-      return options?.interval ?? queryConfig.defaultInterval;
+    if (options?.watch === true) {
+      return DEFAULT_WATCH_INTERVAL;
+    }
+    if (typeof options?.watch === "number") {
+      return options.watch;
     }
     return false;
   });
@@ -75,27 +69,22 @@ export function useBalance(
  * ```
  */
 export function useBlockNumber(options?: {
-  watch?: UpdateStrategy | boolean;
-  interval?: number;
+  /**
+   * Enable polling for this query
+   * - false: no polling (relies on block watcher)
+   * - true: poll at default interval (4s) (default for this hook)
+   * - number: poll at specific interval in milliseconds
+   */
+  watch?: boolean | number;
   chainId?: WagmiChain;
 }) {
-  const updateStrategy = $derived.by((): UpdateStrategy => {
-    if (options?.watch === undefined) {
-      // Block number usually wants frequent updates
-      return "interval";
-    }
-    if (options.watch === true) {
-      return "interval";
-    }
-    if (options.watch === false) {
-      return "manual";
-    }
-    return options.watch;
-  });
-
   const refetchInterval = $derived.by(() => {
-    if (updateStrategy === "interval") {
-      return options?.interval ?? queryConfig.defaultInterval;
+    // Block number defaults to polling if watch is not specified
+    if (options?.watch === undefined || options.watch === true) {
+      return DEFAULT_WATCH_INTERVAL;
+    }
+    if (typeof options.watch === "number") {
+      return options.watch;
     }
     return false;
   });
@@ -125,26 +114,21 @@ export function useBlockNumber(options?: {
 export function useBlock(options?: {
   blockNumber?: bigint;
   blockHash?: `0x${string}`;
-  watch?: UpdateStrategy | boolean;
-  interval?: number;
+  /**
+   * Enable polling for this query
+   * - false: no polling (default, relies on block watcher)
+   * - true: poll at default interval (4s)
+   * - number: poll at specific interval in milliseconds
+   */
+  watch?: boolean | number;
   chainId?: WagmiChain;
 }) {
-  const updateStrategy = $derived.by((): UpdateStrategy => {
-    if (options?.watch === undefined) {
-      return queryConfig.defaultStrategy;
-    }
-    if (options.watch === true) {
-      return "interval";
-    }
-    if (options.watch === false) {
-      return "manual";
-    }
-    return options.watch;
-  });
-
   const refetchInterval = $derived.by(() => {
-    if (updateStrategy === "interval") {
-      return options?.interval ?? queryConfig.defaultInterval;
+    if (options?.watch === true) {
+      return DEFAULT_WATCH_INTERVAL;
+    }
+    if (typeof options?.watch === "number") {
+      return options.watch;
     }
     return false;
   });
@@ -179,8 +163,13 @@ export function useBlock(options?: {
 export function useNetworkInfo(
   address: Address | undefined,
   options?: {
-    watch?: UpdateStrategy | boolean;
-    interval?: number;
+    /**
+     * Enable polling for these queries
+     * - false: no polling (default, relies on block watcher)
+     * - true: poll at default interval (4s)
+     * - number: poll at specific interval in milliseconds
+     */
+    watch?: boolean | number;
     chainId?: WagmiChain;
   },
 ) {

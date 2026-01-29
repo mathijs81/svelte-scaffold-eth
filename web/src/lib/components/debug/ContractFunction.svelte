@@ -50,7 +50,7 @@ const readQuery = $derived(
         functionName: functionAbi.name,
         args: readArgs,
         chainId,
-        watch: "manual",
+        watch: false,
         enabled: readTriggered,
       })
     : null,
@@ -77,7 +77,6 @@ function handleRead() {
 
   readArgs = args;
   readTriggered = true;
-  readQuery?.refetch();
 }
 
 function handleWrite() {

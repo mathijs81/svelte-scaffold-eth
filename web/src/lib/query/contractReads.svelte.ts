@@ -4,9 +4,9 @@ import { createDeployedContractInfo } from "$lib/web3/createDeployedContractInfo
 import { createQuery } from "@tanstack/svelte-query";
 import { readContractQueryOptions } from "@wagmi/core/query";
 import type { Abi } from "viem";
-import { queryConfig, type UpdateStrategy } from "./config";
 import { getGlobalClient } from "./globalClient";
 import type { ContractName } from "$lib/contracts/deployedContracts";
+import { DEFAULT_WATCH_INTERVAL } from "./config";
 
 export interface UseContractReadOptions {
   contract: `0x${string}` | ContractName;
@@ -14,8 +14,13 @@ export interface UseContractReadOptions {
   functionName: string;
   args?: readonly unknown[];
   chainId: WagmiChain;
-  watch?: UpdateStrategy | boolean;
-  interval?: number;
+  /**
+   * Enable polling for this query
+   * - false: no polling (default, relies on block watcher)
+   * - true: poll at default interval (4s)
+   * - number: poll at specific interval in milliseconds
+   */
+  watch?: boolean | number;
   enabled?: boolean;
   staleTime?: number;
 }
@@ -23,7 +28,6 @@ export interface UseContractReadOptions {
 export function useContractRead(options: UseContractReadOptions) {
   let contractAddress: `0x${string}`;
   let contractAbi: Abi;
-
   if (
     typeof options.contract === "string" &&
     options.contract.startsWith("0x")
@@ -45,19 +49,12 @@ export function useContractRead(options: UseContractReadOptions) {
     contractAbi = options.abi || contract.abi;
   }
 
-  const watchStrategy =
-    options.watch === undefined
-      ? queryConfig.defaultStrategy
-      : options.watch === true
-        ? "interval"
-        : options.watch === false
-          ? "manual"
-          : options.watch;
-
   const refetchInterval =
-    watchStrategy === "interval"
-      ? (options.interval ?? queryConfig.defaultInterval)
-      : false;
+    options.watch === true
+      ? DEFAULT_WATCH_INTERVAL
+      : typeof options.watch === "number"
+        ? options.watch
+        : false;
 
   return createQuery(
     () =>
