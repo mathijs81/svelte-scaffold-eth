@@ -3,7 +3,7 @@ import { switchChain } from "@wagmi/core";
 import WarningIcon from "phosphor-svelte/lib/WarningIcon";
 import { config } from "$lib/wagmi/config";
 import { getTargetNetwork } from "$lib/wagmi/chains";
-import { createConnection } from "$lib/web3";
+import { createConnection } from "$lib/web3/createConnection.svelte";
 
 const connection = createConnection();
 const targetNetwork = getTargetNetwork();

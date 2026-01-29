@@ -1,7 +1,6 @@
 <script lang="ts">
 import { onMount } from "svelte";
-import { txWatcher } from "$lib/web3";
-import type { TxState } from "$lib/web3";
+import { txWatcher, type TxState } from "$lib/web3/txWatcher.svelte";
 import {
   toastTransaction,
   toastTransactionSuccess,

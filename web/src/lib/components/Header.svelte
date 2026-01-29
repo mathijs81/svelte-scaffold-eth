@@ -1,7 +1,7 @@
 <script lang="ts">
-import { useBalance, useBlockNumber } from "$lib/query";
+import { useBalance, useBlockNumber } from "$lib/query/networkInfo.svelte";
 import { config } from "$lib/wagmi/config";
-import { createConnection } from "$lib/web3";
+import { createConnection } from "$lib/web3/createConnection.svelte";
 import { connect, disconnect } from "@wagmi/core";
 import XCircleIcon from "phosphor-svelte/lib/XCircleIcon";
 import NetworkMismatchAlert from "./NetworkMismatchAlert.svelte";

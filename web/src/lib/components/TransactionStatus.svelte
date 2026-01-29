@@ -1,6 +1,7 @@
 <script lang="ts">
 import type { WagmiChain } from "$lib/utils/types";
-import { getTransactionUrl, txWatcher } from "$lib/web3";
+import { getTransactionUrl } from "$lib/web3/utils";
+import { txWatcher } from "$lib/web3/txWatcher.svelte";
 
 interface Props {
   hash: `0x${string}`;

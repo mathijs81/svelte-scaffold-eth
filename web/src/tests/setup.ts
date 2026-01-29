@@ -5,7 +5,7 @@ import {
   revertToSnapshot,
 } from "./anvil";
 import { setGlobalClient } from "$lib/query/globalClient";
-import { createBlockchainQueryClient } from "$lib/query";
+import { createBlockchainQueryClient } from "$lib/query/config";
 import { updateConfigForTest, type Config } from "$lib/wagmi/config";
 import { createTestWagmiConfig } from "./wagmi-test-config";
 import { TEST_ACCOUNTS } from "./anvil";

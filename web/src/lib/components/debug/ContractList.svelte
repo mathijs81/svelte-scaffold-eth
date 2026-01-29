@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { ContractName } from "$lib/contracts/deployedContracts";
 import type { WagmiChain } from "$lib/utils/types";
-import { getAllDeployedContracts } from "$lib/web3";
+import { getAllDeployedContracts } from "$lib/web3/createDeployedContractInfo.svelte";
 import ContractUI from "./ContractUI.svelte";
 import NoContractsAlert from "./NoContractsAlert.svelte";
 

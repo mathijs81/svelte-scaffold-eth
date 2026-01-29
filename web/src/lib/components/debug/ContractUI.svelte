@@ -1,6 +1,6 @@
 <script lang="ts">
 import type { ContractName, WagmiChain } from "$lib/utils/types";
-import { createDeployedContractInfo } from "$lib/web3";
+import { createDeployedContractInfo } from "$lib/web3/createDeployedContractInfo.svelte";
 
 import ContractFunction from "./ContractFunction.svelte";
 import type { AbiFunction } from "viem";
