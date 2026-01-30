@@ -33,7 +33,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^25.0.10",
+    "@types/node": "^25.1.0",
     "solhint": "^6.0.3",
     "tsx": "^4.21.0"
   }
