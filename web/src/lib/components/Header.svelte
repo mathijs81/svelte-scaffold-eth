@@ -1,4 +1,5 @@
 <script lang="ts">
+import { page } from "$app/state";
 import { useBalance, useBlockNumber } from "$lib/query/networkInfo.svelte";
 import { config } from "$lib/wagmi/config";
 import { createConnection } from "$lib/web3/createConnection.svelte";
@@ -42,11 +43,29 @@ async function disconnectWallet() {
   connectError = null;
   await disconnect(config);
 }
+
+const baseDestinations = [
+  ["Debug", "/debug"],
+  // Add your other destinations here
+] as const;
+
+const destinations = $derived(
+  baseDestinations.map(([name, href]) => [
+    name,
+    href,
+    page.url.pathname?.startsWith(href) ?? false,
+  ]),
+) as [string, string, boolean][];
 </script>
 
 <div class="navbar bg-base-100 shadow-lg">
-  <div class="flex-1">
+  <div>
     <a href="/" class="btn btn-ghost text-xl">Svelte Scaffold ETH</a>
+  </div>
+  <div class="flex gap-3 flex-1">
+    {#each destinations as [name, href, active] (name)}
+      <a href={href} class="btn btn-ghost" class:btn-active={active}>{name}</a>
+    {/each}
   </div>
   <div class="flex gap-3 items-baseline">
     {#if chainName}

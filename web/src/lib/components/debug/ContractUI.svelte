@@ -26,6 +26,9 @@ const readFunctions = $derived(
   ) || [],
 );
 
+const uniqueFunctionName = (func: AbiFunction) =>
+  `${contractName}-${func.name}-${func.inputs?.map((input, index) => input.name || `arg${index}`).join("-") ?? ""}`;
+
 const writeFunctions = $derived(
   contractInfo?.abi.filter(
     (item): item is AbiFunction =>
@@ -72,7 +75,7 @@ let activeTab = $state<"read" | "write">("read");
 					{#if readFunctions.length === 0}
 						<p class="text-base-content/70">No read functions available</p>
 					{:else}
-						{#each readFunctions as func (func.name)}
+						{#each readFunctions as func (uniqueFunctionName(func))}
 							<ContractFunction
 								{contractName}
 								{chainId}
@@ -85,7 +88,7 @@ let activeTab = $state<"read" | "write">("read");
 					{#if writeFunctions.length === 0}
 						<p class="text-base-content/70">No write functions available</p>
 					{:else}
-						{#each writeFunctions as func (func.name)}
+						{#each writeFunctions as func (uniqueFunctionName(func))}
 							<ContractFunction
 								{contractName}
 								{chainId}
